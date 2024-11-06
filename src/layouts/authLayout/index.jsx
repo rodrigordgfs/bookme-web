@@ -1,10 +1,12 @@
 import { Outlet } from "react-router-dom";
 
 const AuthLayout = () => {
-  return <main>
-    {/* Navbar */}
-    <Outlet />
-  </main>;
+  return (
+    <div>
+      {/* Navbar */}
+      <Outlet />
+    </div>
+  );
 };
 
 export default AuthLayout;

@@ -1,4 +1,23 @@
+import { useNavigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
+import { useState } from "react";
+
 const LoginPage = () => {
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleGoToRegister = () => {
+    navigate("/register");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+  };
+
   return (
     <main className="w-full h-screen flex flex-row">
       <div className="flex-1 flex items-center justify-center">
@@ -10,27 +29,40 @@ const LoginPage = () => {
           <p className="font-medium text-zinc-700 text-lg text-center mt-8">
             Acesse sua conta
           </p>
-          <form className="flex flex-col gap-2 mt-4">
+          <form className="flex flex-col gap-2 mt-4" onSubmit={handleSubmit}>
             <input
               type="email"
               placeholder="E-mail"
               className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none border-zinc-300 rounded-lg flex items-center gap-2"
+              disabled={loading}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <input
               type="password"
               placeholder="Senha"
               className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none border-zinc-300 first-line: rounded-lg flex items-center gap-2"
+              disabled={loading}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <button
               type="submit"
               className="w-full h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-lg mt-2 transition-all"
             >
-              Entrar
+              {loading ? (
+                <FaSpinner className="animate-spin mx-auto" />
+              ) : (
+                "Entrar"
+              )}
             </button>
           </form>
           <p className="font-normal text-center mt-8">
             Não tenho uma conta{" "}
-            <span className="cursor-pointer text-blue-500 hover:text-blue-600 font-medium transition-all">
+            <span
+              onClick={handleGoToRegister}
+              className="cursor-pointer text-blue-500 hover:text-blue-600 font-medium transition-all"
+            >
               Criar conta!
             </span>
           </p>
