@@ -15,11 +15,9 @@ const schema = z
     password: z
       .string()
       .min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
-    confirmPassword: z
-      .string()
-      .min(6, {
-        message: "A confirmação de senha deve ter pelo menos 6 caracteres",
-      }),
+    confirmPassword: z.string().min(6, {
+      message: "A confirmação de senha deve ter pelo menos 6 caracteres",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",
@@ -47,8 +45,10 @@ const RegisterPage = () => {
   const handleRegister = async (email, password, name) => {
     UserService.register({ email, password, name })
       .then(({ data }) => {
+        const firtsName = data.name.split(" ")[0];
+        toast.success(`Bem-vindo(a), ${firtsName}!`);
         login(data);
-        toast.success("Conta criada com sucesso!");
+        navigate("/");
       })
       .catch(({ response }) => {
         console.log(response);

@@ -34,8 +34,10 @@ const LoginPage = () => {
   const handleLogin = async ({ email, password }) => {
     UserService.login({ email, password })
       .then(({ data }) => {
+        const firtsName = data.name.split(" ")[0];
+        toast.success(`Bem-vindo(a) de volta, ${firtsName}!`);
         login(data);
-        toast.success("Login efetuado com sucesso!");
+        navigate("/");
       })
       .catch(({ response }) => {
         console.log(response);
