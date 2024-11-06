@@ -1,21 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+  email: z.string().email("E-mail inválido"),
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+});
 
 const LoginPage = () => {
   const navigate = useNavigate();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
 
   const handleGoToRegister = () => {
     navigate("/register");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setLoading(true);
+    console.log(data);
   };
 
   return (
@@ -29,23 +42,37 @@ const LoginPage = () => {
           <p className="font-medium text-zinc-700 text-lg text-center mt-8">
             Acesse sua conta
           </p>
-          <form className="flex flex-col gap-2 mt-4" onSubmit={handleSubmit}>
-            <input
-              type="email"
-              placeholder="E-mail"
-              className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none border-zinc-300 rounded-lg flex items-center gap-2"
-              disabled={loading}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Senha"
-              className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none border-zinc-300 first-line: rounded-lg flex items-center gap-2"
-              disabled={loading}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <form className="flex flex-col gap-2 mt-4" onSubmit={handleSubmit(onSubmit)}>
+            <div>
+              <input
+                type="email"
+                placeholder="E-mail"
+                className={`w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 ${
+                  errors.email ? "border-red-500 outline-none" : "border-zinc-300"
+                }`}
+                disabled={loading}
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <input
+                type="password"
+                placeholder="Senha"
+                className={`w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 outline-none border rounded-lg flex items-center gap-2 ${
+                  errors.password ? "border-red-500 outline-none" : "border-zinc-300"
+                }`}
+                disabled={loading}
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+              )}
+            </div>
+
             <button
               type="submit"
               className="w-full h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-lg mt-2 transition-all"
