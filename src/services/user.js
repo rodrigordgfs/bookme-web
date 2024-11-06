@@ -3,7 +3,6 @@ import AxiosServices from './axios'
 class UsersService extends AxiosServices {
     constructor() {
         super({
-            url: '/users',
             config: {
                 baseURL: import.meta.env.VITE_API_URL,
             }
@@ -11,11 +10,11 @@ class UsersService extends AxiosServices {
     }
 
     login(body) {
-        return this.axios.post(`${this.url}/login`, body)
+        return this.axios.post(`${this.url}/auth/login`, body)
     }
 
     register(body) {
-        return this.axios.post(`${this.url}/register`, body)
+        return this.axios.post(`${this.url}/auth/register`, body)
     }
 }
 

@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import UserService from "../../services/user";
+import { AuthContext } from "../../contexts/auth";
+import { toast } from "react-toastify";
 
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -12,6 +15,8 @@ const schema = z.object({
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
   const [loading, setLoading] = useState(false);
 
   const {
@@ -26,9 +31,28 @@ const LoginPage = () => {
     navigate("/register");
   };
 
+  const handleLogin = async ({ email, password }) => {
+    UserService.login({ email, password })
+      .then(({ data }) => {
+        login(data);
+        toast.success("Login efetuado com sucesso!");
+      })
+      .catch(({ response }) => {
+        console.log(response);
+        if (response?.data?.error) {
+          return toast.error(response.data.error);
+        } else {
+          toast.error("Erro ao efetuar login!");
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
-    console.log(data);
+    handleLogin(data);
   };
 
   return (
@@ -42,19 +66,26 @@ const LoginPage = () => {
           <p className="font-medium text-zinc-700 text-lg text-center mt-8">
             Acesse sua conta
           </p>
-          <form className="flex flex-col gap-2 mt-4" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            className="flex flex-col gap-2 mt-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div>
               <input
                 type="email"
                 placeholder="E-mail"
                 className={`w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 ${
-                  errors.email ? "border-red-500 outline-none" : "border-zinc-300"
+                  errors.email
+                    ? "border-red-500 outline-none"
+                    : "border-zinc-300"
                 }`}
                 disabled={loading}
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -63,13 +94,17 @@ const LoginPage = () => {
                 type="password"
                 placeholder="Senha"
                 className={`w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 outline-none border rounded-lg flex items-center gap-2 ${
-                  errors.password ? "border-red-500 outline-none" : "border-zinc-300"
+                  errors.password
+                    ? "border-red-500 outline-none"
+                    : "border-zinc-300"
                 }`}
                 disabled={loading}
                 {...register("password")}
               />
               {errors.password && (
-                <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
