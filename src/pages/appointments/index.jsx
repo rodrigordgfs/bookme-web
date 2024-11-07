@@ -1,42 +1,23 @@
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import format from "date-fns/format";
-import parse from "date-fns/parse";
-import startOfWeek from "date-fns/startOfWeek";
-import getDay from "date-fns/getDay";
-import ptBR from "date-fns/locale/pt-BR";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useState } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from 'moment';
+import { useCallback, useContext, useEffect, useState } from "react";
 import ModalAppointment from "../../components/ModalAppointment";
+import AppointmentsService from "../../services/appointment";
+import { AuthContext } from "../../contexts/auth";
+import { toast } from "react-toastify";
+import { add } from "date-fns";
+import 'moment-timezone';
+import 'moment/locale/pt-br';
 
-const locales = {
-  "pt-BR": ptBR,
-};
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek: () => startOfWeek(new Date(), { locale: ptBR }),
-  getDay,
-  locales,
-});
-
-const myEventsList = [
-  {
-    id: 1,
-    title: "Reunião com Cliente",
-    start: new Date("2024-11-07T13:45:00-05:00"),
-    end: new Date("2024-11-07T14:00:00-05:00"),
-  },
-  {
-    id: 2,
-    title: "Planejamento de Projeto",
-    start: new Date("2024-11-06T13:45:00-05:00"),
-    end: new Date("2024-11-06T14:00:00-05:00"),
-  },
-];
+moment.locale('pt-br');
+const localizer = momentLocalizer(moment);
 
 const Appointments = () => {
+  const { user } = useContext(AuthContext);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [appointments, setAppointments] = useState([]);
+  const [defaultView, setDefaultView] = useState(window.innerWidth < 768 ? 'day' : 'month'); // Define a visualização inicial
 
   const handleNewAppointment = () => {
     setIsModalOpen(true);
@@ -44,12 +25,60 @@ const Appointments = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    handleLoadAppointments();
   };
+
+  const handleLoadAppointments = useCallback(() => {
+    AppointmentsService.getAppointments(user.token)
+      .then(({ data }) => {
+        const appointmentsData = data.map((appointment) => ({
+          id: appointment.id,
+          title: `${appointment.professionalService.service.description} - ${appointment.client.user.name}`,
+          start: new Date(appointment.dateTime),
+          end: add(new Date(appointment.dateTime), {
+            minutes: appointment.professionalService.service.duration,
+          }),
+        }));
+        setAppointments(appointmentsData);
+      })
+      .catch(({ response }) => {
+        console.log(response);
+        if (response?.data?.error) {
+          return toast.error(response.data.error);
+        } else {
+          toast.error("Erro ao buscar os agendamentos!");
+        }
+      })
+  }, [user.token]);
+
+  useEffect(() => {
+    handleLoadAppointments();
+  }, [handleLoadAppointments]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setDefaultView('day');
+      } else {
+        setDefaultView('month');
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="flex flex-col w-full max-w-full">
       <div className="flex flex-row h-20 items-center justify-between">
-        <h1 className="text-2xl font-medium">Agendamentos</h1>
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-medium">Agendamentos</h1>
+          <p className="text-sm text-zinc-600">
+            Visualize e controle todos os seus horários e compromissos
+            agendados.
+          </p>
+        </div>
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-md"
           onClick={handleNewAppointment}
@@ -59,12 +88,13 @@ const Appointments = () => {
       </div>
       <Calendar
         localizer={localizer}
-        events={myEventsList}
+        events={appointments}
         startAccessor="start"
         endAccessor="end"
         titleAccessor="title"
         onSelectEvent={(event) => console.log(event)}
         style={{ height: "calc(100vh - 170px)" }}
+        defaultView={defaultView}
         messages={{
           next: "Próximo",
           previous: "Anterior",

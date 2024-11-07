@@ -1,4 +1,4 @@
-import { IoChevronDownOutline, IoMenu, IoPerson } from "react-icons/io5";
+import { IoChevronDownOutline, IoMenu } from "react-icons/io5";
 import { useContext, useState, useRef } from "react";
 import { AuthContext } from "../../contexts/auth";
 import { Link } from "react-router-dom";
@@ -38,8 +38,8 @@ const NavBar = () => {
         className="hidden md:flex flex-row items-center gap-3 relative"
         ref={dropdownRef}
       >
-        <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
-          <IoPerson className="w-4 h-4 text-blue-500" />
+        <div className="w-7 h-7 rounded-full flex items-center justify-center">
+        <img src="https://github.com/rodrigordgfs.png" className="w-7 h-7" />
         </div>
         <span className="text-white ml-1">
           Olá, <strong>{FirtName}</strong>

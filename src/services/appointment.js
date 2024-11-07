@@ -10,6 +10,14 @@ class AppointmentService extends AxiosServices {
         })
     }
 
+    getAppointments(token) {
+        return this.axios.get(this.url, {
+            headers: {
+                Authorization: `JWT ${token}`
+            }
+        })
+    }
+
     postAppointment(body, token) {
         return this.axios.post(this.url, body, {
             headers: {
