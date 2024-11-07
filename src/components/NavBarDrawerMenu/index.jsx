@@ -1,4 +1,5 @@
 import { IoClose } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 const NavBarDrawerMenu = ({ isOpen, onClose }) => {
@@ -24,33 +25,22 @@ const NavBarDrawerMenu = ({ isOpen, onClose }) => {
         <nav className="mt-4">
           <ul className="space-y-4">
             <li>
-              <a href="/" className="text-blue-500 hover:underline text-center">
+              <Link
+                to="/"
+                onClick={onClose}
+                className="text-blue-500 hover:underline text-center"
+              >
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/about"
+              <Link
+                to="/appointments"
+                onClick={onClose}
                 className="text-blue-500 hover:underline text-center"
               >
-                About
-              </a>
-            </li>
-            <li>
-              <a
-                href="/services"
-                className="text-blue-500 hover:underline text-center"
-              >
-                Services
-              </a>
-            </li>
-            <li>
-              <a
-                href="/contact"
-                className="text-blue-500 hover:underline text-center"
-              >
-                Contact
-              </a>
+                Appointmetns
+              </Link>
             </li>
           </ul>
         </nav>

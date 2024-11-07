@@ -5,8 +5,10 @@ const AuthLayout = () => {
   return (
     <div>
       <NavBar />
-      <div className="max-w-full w-full h-full p-2">
-        <Outlet />
+      <div className="flex justify-center items-center w-full h-full bg-zinc-100">
+        <div className="max-w-[1200px] w-full h-full bg-white p-4">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

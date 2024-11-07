@@ -3,14 +3,16 @@ import AuthLayout from "../layouts/authLayout";
 import NoAuthLayout from "../layouts/noAuthLayout";
 import LoginPage from "../pages/login";
 import RegisterPage from "../pages/register";
-import Home from "../pages/home";
+import HomePage from "../pages/home";
+import AppointmentsPage from "../pages/appointments";
 
 const AppRoutes = () => {
   return (
     <Router>
       <Routes>
         <Route element={<AuthLayout />}>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/appointments" element={<AppointmentsPage />} />
         </Route>
         <Route element={<NoAuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
