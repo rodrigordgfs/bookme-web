@@ -3,10 +3,10 @@ import NavBar from "../../components/Navbar";
 
 const AuthLayout = () => {
   return (
-    <div>
+    <div className="h-screen flex flex-col">
       <NavBar />
-      <div className="flex justify-center items-center w-full h-full bg-zinc-100">
-        <div className="max-w-[1200px] w-full h-full bg-white p-4">
+      <div className="flex-1 flex justify-center  bg-zinc-100">
+        <div className="w-full max-w-[1200px] bg-white p-4">
           <Outlet />
         </div>
       </div>
