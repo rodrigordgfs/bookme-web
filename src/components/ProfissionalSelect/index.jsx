@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 
-// eslint-disable-next-line react/prop-types
-const ProfissionalSelect = ({ professionals, onChange, loading, disabled }) => {
+const ProfissionalSelect = ({ professionals, onChange, professionalSelected, loading, disabled }) => {
   const [search, setSearch] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // eslint-disable-next-line react/prop-types
   const filteredProfessionals = professionals.filter((professional) =>
     String(professional.user.name).toLowerCase().includes(search.toLowerCase())
   );
@@ -29,6 +27,15 @@ const ProfissionalSelect = ({ professionals, onChange, loading, disabled }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (professionalSelected) {
+      setSearch(professionalSelected.name);
+    } else {
+      setSearch('');
+    }
+  }
+  , [professionalSelected]);
 
   return (
     <div ref={dropdownRef} className="relative">

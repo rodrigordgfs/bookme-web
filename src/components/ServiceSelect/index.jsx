@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 
-// eslint-disable-next-line react/prop-types
-const ServiceSelect = ({ services, onChange, disabled, loading }) => {
+const ServiceSelect = ({ services, onChange, serviceSelected, disabled, loading }) => {
   const [search, setSearch] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // eslint-disable-next-line react/prop-types
   const filteredServices = services.filter((service) =>
     String(service.service.name).toLowerCase().includes(search.toLowerCase())
   );
@@ -29,6 +27,16 @@ const ServiceSelect = ({ services, onChange, disabled, loading }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (serviceSelected) {
+      console.log('serviceSelected', serviceSelected);
+      setSearch(serviceSelected.description || '');
+    } else {
+      setSearch('');
+    }
+  }, [serviceSelected]);
+  
 
   return (
     <div ref={dropdownRef} className="relative">

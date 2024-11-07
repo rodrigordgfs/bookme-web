@@ -1,6 +1,5 @@
 import { IoCloseSharp } from "react-icons/io5";
 
-// eslint-disable-next-line react/prop-types
 const Modal = ({ isOpen, onClose, title, subtitle, children }) => {
   if (!isOpen) return null;
 

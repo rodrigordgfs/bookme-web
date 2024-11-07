@@ -10,8 +10,12 @@ import AppointmentService from "../../services/appointment";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 
-// eslint-disable-next-line react/prop-types
-const ModalAppointment = ({ isModalOpen, onClose, handleCloseModal }) => {
+const ModalAppointment = ({
+  isModalOpen,
+  onClose,
+  handleCloseModal,
+  selectedAppointment,
+}) => {
   const { user } = useContext(AuthContext);
 
   const [selectedClient, setSelectedClient] = useState(null);
@@ -58,8 +62,37 @@ const ModalAppointment = ({ isModalOpen, onClose, handleCloseModal }) => {
       });
   };
 
+  const handleEditAppointment = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    AppointmentService.patchAppointment(
+      selectedAppointment.id,
+      {
+        professionalServiceId: selectedProfissionalService.id,
+        clientId: selectedClient.id,
+        dateTime: `${selectedDate}T${selectedTime}:00`,
+        observation,
+      },
+      user.token
+    )
+      .then(() => {
+        toast.success("Agendamento editado com sucesso!");
+        handleCloseModal();
+      })
+      .catch(({ response }) => {
+        console.log(response);
+        if (response?.data?.error) {
+          return toast.error(response.data.error);
+        } else {
+          toast.error("Erro ao editar o agendamento!");
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const handleClientChange = (client) => {
-    console.log("client", client);
     setSelectedClient(client);
   };
 
@@ -69,7 +102,6 @@ const ModalAppointment = ({ isModalOpen, onClose, handleCloseModal }) => {
   };
 
   const handleServiceChange = (service) => {
-    console.log("service", service);
     setSelectedProfissionalService(service);
   };
 
@@ -115,44 +147,81 @@ const ModalAppointment = ({ isModalOpen, onClose, handleCloseModal }) => {
       });
   }, [user.token]);
 
-  const handleLoadProfessionalServices = (professionalId) => {
-    setLoadingServices(true);
-    ProfissionalsService.getProfessionalServices(professionalId, user.token)
-      .then(({ data }) => {
-        setServices(data);
-        setLoadingServices(false);
-      })
-      .catch(({ response }) => {
-        console.log(response);
-        if (response?.data?.error) {
-          return toast.error(response.data.error);
-        } else {
-          toast.error("Erro ao buscar os serviços!");
-        }
-      });
-  };
+  const handleLoadProfessionalServices = useCallback(
+    (professionalId, professionalService = null) => {
+      setLoadingServices(true);
+      ProfissionalsService.getProfessionalServices(professionalId, user.token)
+        .then(({ data }) => {
+          setServices(data);
+          if (professionalService) {
+            setSelectedProfissionalService(professionalService);
+          }
+          setLoadingServices(false);
+        })
+        .catch(({ response }) => {
+          console.log(response);
+          if (response?.data?.error) {
+            return toast.error(response.data.error);
+          } else {
+            toast.error("Erro ao buscar os serviços!");
+          }
+        });
+    },
+    [user.token]
+  );
 
   useEffect(() => {
     handleLoadClients();
     handleLoadProfissionals();
   }, [handleLoadClients, handleLoadProfissionals]);
 
+  useEffect(() => {
+    if (selectedAppointment) {
+      handleLoadProfessionalServices(
+        selectedAppointment.professional.id,
+        selectedAppointment.service
+      );
+      setSelectedClient(selectedAppointment.client);
+      setSelectedProfissional(selectedAppointment.professional);
+      setSelectedDate(selectedAppointment.date);
+      setSelectedTime(selectedAppointment.hour);
+      setObservation(selectedAppointment.observation || "");
+    } else {
+      setSelectedClient(null);
+      setSelectedProfissional(null);
+      setSelectedProfissionalService(null);
+      setSelectedDate("");
+      setSelectedTime("");
+      setObservation("");
+    }
+  }, [selectedAppointment, handleLoadProfessionalServices]);
+
   return (
     <Modal
       isOpen={isModalOpen}
       onClose={handleCloseModal}
-      title="Novo Agendamento"
-      subtitle="Preencha as informações abaixo para criar um novo agendamento"
+      title={selectedAppointment ? "Editar Agendamento" : "Novo Agendamento"}
+      subtitle={
+        selectedAppointment
+          ? "Edite os dados do agendamento"
+          : "Preencha os dados do agendamento"
+      }
     >
       <div>
-        <form className="flex flex-col gap-2" onSubmit={handleSaveAppointment}>
+        <form
+          className="flex flex-col gap-2"
+          onSubmit={
+            selectedAppointment ? handleEditAppointment : handleSaveAppointment
+          }
+        >
           <div className="flex flex-col">
             <p>Cliente</p>
             <ClientSelect
               clients={clients}
               onChange={handleClientChange}
               loading={loadingClients}
-              disabled={loading}
+              disabled={loadingClients || loading}
+              clientSelected={selectedClient}
             />
           </div>
           <div className="flex flex-col">
@@ -161,7 +230,8 @@ const ModalAppointment = ({ isModalOpen, onClose, handleCloseModal }) => {
               professionals={profissionals}
               onChange={handleProfissionalChange}
               loading={loadingProfissionals}
-              disabled={selectedClient === null || loading}
+              disabled={loadingProfissionals || loading}
+              professionalSelected={selectedProfissional}
             />
           </div>
           <div className="flex flex-col">
@@ -169,12 +239,9 @@ const ModalAppointment = ({ isModalOpen, onClose, handleCloseModal }) => {
             <ServiceSelect
               services={services}
               onChange={handleServiceChange}
-              disabled={
-                selectedProfissional === null ||
-                services.length === 0 ||
-                loading
-              }
+              disabled={selectedProfissional === null || loading}
               loading={loadingServices}
+              serviceSelected={selectedProfissionalService}
             />
           </div>
           <div className="flex gap-4">

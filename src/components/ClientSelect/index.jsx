@@ -1,12 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
-// eslint-disable-next-line react/prop-types
-const ClientSelect = ({ clients, onChange, loading, disabled }) => {
-  const [search, setSearch] = useState('');
+const ClientSelect = ({
+  clients,
+  onChange,
+  clientSelected,
+  loading,
+  disabled,
+}) => {
+  const [search, setSearch] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // eslint-disable-next-line react/prop-types
   const filteredClients = clients.filter((client) =>
     String(client.user.name).toLowerCase().includes(search.toLowerCase())
   );
@@ -24,11 +28,19 @@ const ClientSelect = ({ clients, onChange, loading, disabled }) => {
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (clientSelected) {
+      setSearch(clientSelected.name);
+    } else {
+      setSearch("");
+    }
+  }, [clientSelected]);
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -39,7 +51,9 @@ const ClientSelect = ({ clients, onChange, loading, disabled }) => {
         onFocus={() => setIsDropdownOpen(true)}
         disabled={loading || disabled}
         className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-        placeholder={loading ? 'Carregando clientes...' : 'Selecione um cliente'}
+        placeholder={
+          loading ? "Carregando clientes..." : "Selecione um cliente"
+        }
       />
       {isDropdownOpen && (
         <div className="absolute z-10 w-full max-h-60 overflow-y-auto bg-white border rounded-lg shadow-md mt-1">
@@ -57,7 +71,11 @@ const ClientSelect = ({ clients, onChange, loading, disabled }) => {
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (
-                  <div className={`w-8 h-8 flex items-center justify-center bg-blue-500 text-white font-bold rounded-full ${client.gender === 'M' ? 'bg-blue-500' : 'bg-pink-500'}`}>
+                  <div
+                    className={`w-8 h-8 flex items-center justify-center bg-blue-500 text-white font-bold rounded-full ${
+                      client.gender === "M" ? "bg-blue-500" : "bg-pink-500"
+                    }`}
+                  >
                     {client.user.name.split(" ")[0][0]}
                   </div>
                 )}
@@ -65,7 +83,9 @@ const ClientSelect = ({ clients, onChange, loading, disabled }) => {
               </div>
             ))
           ) : (
-            <div className="px-4 py-2 text-zinc-500">Nenhum cliente encontrado</div>
+            <div className="px-4 py-2 text-zinc-500">
+              Nenhum cliente encontrado
+            </div>
           )}
         </div>
       )}

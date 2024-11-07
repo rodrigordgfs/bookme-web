@@ -2,7 +2,6 @@ import { useContext, useEffect } from "react";
 import { AuthContext } from "../../contexts/auth";
 import { useNavigate } from "react-router-dom";
 
-// eslint-disable-next-line react/prop-types
 const NavBarDropDown = ({ isDropdownOpen, setDropdownOpen, dropdownRef }) => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -14,7 +13,6 @@ const NavBarDropDown = ({ isDropdownOpen, setDropdownOpen, dropdownRef }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // eslint-disable-next-line react/prop-types
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
