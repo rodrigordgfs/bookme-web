@@ -11,9 +11,12 @@ const ClientSelect = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const filteredClients = clients.filter((client) =>
-    String(client.user.name).toLowerCase().includes(search.toLowerCase())
-  );
+  // Filtro dos clientes com base no campo de pesquisa
+  const filteredClients = clients.filter((client) => {
+    return String(client.user.name)
+      .toLowerCase()
+      .includes(String(search).toLowerCase());
+  });
 
   const handleSelect = (client) => {
     onChange(client);
@@ -35,8 +38,9 @@ const ClientSelect = ({
   }, []);
 
   useEffect(() => {
-    if (clientSelected) {
-      setSearch(clientSelected.name);
+    // Atualiza o campo de pesquisa se um cliente estiver selecionado
+    if (clientSelected && clientSelected.user && clientSelected.user.name) {
+      setSearch(clientSelected.user.name);
     } else {
       setSearch("");
     }
@@ -64,15 +68,15 @@ const ClientSelect = ({
                 onClick={() => handleSelect(client)}
                 className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-zinc-100"
               >
-                {client.user.photoUrl ? (
+                {client.photoUrl ? (
                   <img
-                    src={client.user.photoUrl}
+                    src={client.photoUrl}
                     alt={client.user.name}
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (
                   <div
-                    className={`w-8 h-8 flex items-center justify-center bg-blue-500 text-white font-bold rounded-full ${
+                    className={`w-8 h-8 flex items-center justify-center text-white font-bold rounded-full ${
                       client.gender === "M" ? "bg-blue-500" : "bg-pink-500"
                     }`}
                   >

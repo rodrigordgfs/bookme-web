@@ -1,4 +1,4 @@
-import { IoClose, IoHomeOutline, IoCalendarOutline } from "react-icons/io5";
+import { IoClose, IoHomeOutline, IoCalendarOutline, IoPerson } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 
 const NavBarDrawerMenu = ({ isOpen, onClose }) => {
@@ -48,6 +48,26 @@ const NavBarDrawerMenu = ({ isOpen, onClose }) => {
                   }`}
                 />
                 <span>Home</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/clients"
+                onClick={onClose}
+                className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                  location.pathname === "/clients"
+                    ? "text-blue-500 font-medium"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <IoPerson
+                  className={`w-5 h-5 mr-3 ${
+                    location.pathname === "/clients"
+                      ? "text-blue-500"
+                      : "text-gray-700"
+                  }`}
+                />
+                <span>Clientes</span>
               </Link>
             </li>
             <li>

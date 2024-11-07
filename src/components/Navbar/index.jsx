@@ -23,12 +23,12 @@ const NavBar = () => {
 
   return (
     <nav className="bg-blue-500 h-14 flex flex-row justify-between items-center gap-5 px-2 shadow-md relative">
-      <div className="flex flex-row items-center gap-3">
+      <div className="flex flex-row items-center justify-center md:justify-start gap-3">
         <button
           className="rounded-md hover:bg-white transition-all p-1 group cursor-pointer"
           onClick={toggleDrawer}
         >
-          <IoMenu className="w-7 h-7 text-white group-hover:text-blue-500 transition-all" />
+          <IoMenu className="w-7 h-7 text-white group-hover:text-blue-500 transition-all cursor-pointer" />
         </button>
         <Link to="/">
           <img src="/logo-text-white.svg" className="h-10" />
