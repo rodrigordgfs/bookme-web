@@ -16,6 +16,30 @@ class UsersService extends AxiosServices {
     register(body) {
         return this.axios.post(`${this.url}/auth/register`, body)
     }
+
+    getUsers(token) {
+        return this.axios.get(`${this.url}/users`, {
+            headers: {
+                Authorization: `JWT ${token}`
+            }
+        })
+    }
+
+    postClient(body, token) {
+        return this.axios.post(`${this.url}/clients`, body, {
+            headers: {
+                Authorization: `JWT ${token}`
+            }
+        })
+    }
+
+    patchClient(id, body, token) {
+        return this.axios.patch(`${this.url}/clients/${id}`, body, {
+            headers: {
+                Authorization: `JWT ${token}`
+            }
+        })
+    }
 }
 
 export default new UsersService()
