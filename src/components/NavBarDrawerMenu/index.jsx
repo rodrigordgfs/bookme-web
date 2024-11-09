@@ -1,4 +1,5 @@
-import { IoClose, IoHomeOutline, IoCalendarOutline, IoPerson } from "react-icons/io5";
+import { IoClose, IoHomeOutline, IoCalendarOutline, IoPersonOutline } from "react-icons/io5";
+import { LuLayoutDashboard } from "react-icons/lu";
 import { Link, useLocation } from "react-router-dom";
 
 const NavBarDrawerMenu = ({ isOpen, onClose }) => {
@@ -40,14 +41,14 @@ const NavBarDrawerMenu = ({ isOpen, onClose }) => {
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                <IoHomeOutline
+                <LuLayoutDashboard
                   className={`w-5 h-5 mr-3 ${
                     location.pathname === "/"
                       ? "text-blue-500"
                       : "text-gray-700"
                   }`}
                 />
-                <span>Home</span>
+                <span>Dashboard</span>
               </Link>
             </li>
             <li>
@@ -60,7 +61,7 @@ const NavBarDrawerMenu = ({ isOpen, onClose }) => {
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                <IoPerson
+                <IoPersonOutline
                   className={`w-5 h-5 mr-3 ${
                     location.pathname === "/clients"
                       ? "text-blue-500"

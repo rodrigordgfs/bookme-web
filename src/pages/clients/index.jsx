@@ -15,6 +15,7 @@ const ClientsPage = () => {
   const [selectedClient, setSelectedClient] = useState(null);
 
   const handleCloseModal = () => {
+    handleLoadClients();
     setIsModalOpen(false);
   };
 

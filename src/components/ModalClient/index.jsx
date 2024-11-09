@@ -50,6 +50,7 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
+    
     if (
       file &&
       (file.type === "image/jpg" ||
@@ -60,6 +61,7 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
       reader.onloadend = () => {
         setImageBase64(reader.result);
         setSelectedImage(URL.createObjectURL(file));
+        
       };
       reader.readAsDataURL(file);
     } else {
@@ -119,7 +121,7 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
       client.id,
       {
         id_user: selectedUser.id,
-        photo: selectedImage,
+        photo: imageBase64 ? imageBase64 : selectedImage,
         phone,
         birthDate,
         gender,
