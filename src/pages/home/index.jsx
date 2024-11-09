@@ -7,6 +7,7 @@ import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
 import formatMoneyBRL from "../../utils/formatMoneyBRL";
 import Skeleton from "react-loading-skeleton";
+import { MdOutlineMoodBad } from "react-icons/md";
 
 const HomePage = () => {
   const { user } = useContext(AuthContext);
@@ -88,22 +89,22 @@ const HomePage = () => {
     setLoadingDashboard(true);
 
     Promise.all([
-      DashboardService.getTotalMonth(user.token),
-      DashboardService.getAppointmentsMonth(user.token),
-      DashboardService.getAppointmentsDay(user.token),
+      DashboardService.getTotalMonth(user?.token),
+      DashboardService.getAppointmentsMonth(user?.token),
+      DashboardService.getAppointmentsDay(user?.token),
       DashboardService.getAppointmentsInterval(
         {
           start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
           end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
         },
-        user.token
+        user?.token
       ),
       DashboardService.getServicesInterval(
         {
           start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
           end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
         },
-        user.token
+        user?.token
       ),
     ])
       .then(
@@ -184,7 +185,7 @@ const HomePage = () => {
           toast.error("Erro ao buscar os dados!");
         }
       });
-  }, [user.token, dateRangeStart, dateRangeEnd]);
+  }, [user?.token, dateRangeStart, dateRangeEnd]);
 
   useEffect(() => {
     handleLoadDashboard();
@@ -245,8 +246,8 @@ const HomePage = () => {
                   <span className="text-green-600 font-medium">{`+${totalReceptPercentageChange}%`}</span>
                 ) : (
                   <span className="text-red-600 font-medium">{`-${totalReceptPercentageChange}%`}</span>
-                )}
-                {" "}em relação ao mês passado
+                )}{" "}
+                em relação ao mês passado
               </p>
             </div>
             <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
@@ -262,8 +263,8 @@ const HomePage = () => {
                   <span className="text-green-600 font-medium">{`+${totalAppointmentsPercentageChange}%`}</span>
                 ) : (
                   <span className="text-red-600 font-medium">{`-${totalAppointmentsPercentageChange}%`}</span>
-                )}
-                {" "}em relação ao mês passado
+                )}{" "}
+                em relação ao mês passado
               </p>
             </div>
             <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
@@ -279,8 +280,8 @@ const HomePage = () => {
                   <span className="text-green-600 font-medium">{`+${totalAppointmentsDayPercentageChange}%`}</span>
                 ) : (
                   <span className="text-red-600 font-medium">{`-${totalAppointmentsDayPercentageChange}%`}</span>
-                )}
-                {" "}em relação a ontem
+                )}{" "}
+                em relação a ontem
               </p>
             </div>
             <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
@@ -299,14 +300,14 @@ const HomePage = () => {
             <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
               <div className="flex flex-col md:flex-row justify-between items-center gap-2">
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-md font-medium">Receita no período</h2>
-                  <p className="text-sm text-zinc-600">
+                  <h2 className="text-md font-medium text-center md:text-start">Receita no período</h2>
+                  <p className="text-sm text-zinc-600 text-center md:text-start">
                     Receita diária no período
                   </p>
                 </div>
-                <div className="flex flex-row gap-2 items-center">
+                <div className="flex flex-col md:flex-row gap-2 items-center">
                   <p className="text-sm font-medium">Período</p>
-                  <div className="flex flex-row gap-2 items-center">
+                  <div className="flex flex-col md:flex-row gap-2 items-center">
                     <input
                       type="date"
                       value={dateRangeStart}
@@ -323,28 +324,42 @@ const HomePage = () => {
                   </div>
                 </div>
               </div>
-              <ReactApexChart
-                options={periodRecept.options}
-                series={periodRecept.series}
-                type="line"
-                height={400}
-              />
+              {periodRecept.series[0].data.length === 0 ? (
+                <div className="flex items-center justify-center h-[400px]">
+                  <p className="text-lg font-medium">Sem dados neste período</p>
+                </div>
+              ) : (
+                <ReactApexChart
+                  options={periodRecept.options}
+                  series={periodRecept.series}
+                  type="line"
+                  height={400}
+                />
+              )}
             </div>
             <div className="flex flex-col gap-2 max-w-[420px] w-full border border-zinc-400 rounded-lg p-5">
               <div className="flex flex-col gap-1">
-                <h2 className="text-md font-medium">Serviços populares</h2>
-                <p className="text-sm text-zinc-600">
+                <h2 className="text-md font-medium text-center md:text-start">Serviços populares</h2>
+                <p className="text-sm text-zinc-600 text-center md:text-start">
                   Serviços mais utilizados neste mês
                 </p>
               </div>
               <div className="flex items-center justify-center flex-1">
-                <ReactApexChart
-                  options={popularServices.options}
-                  series={popularServices.series}
-                  type="pie"
-                  width={400}
-                  height={300}
-                />
+                {popularServices.series.length === 0 ? (
+                  <div className="flex items-center justify-center h-[400px]">
+                    <p className="text-lg font-medium">
+                      Sem dados neste período
+                    </p>
+                  </div>
+                ) : (
+                  <ReactApexChart
+                    options={popularServices.options}
+                    series={popularServices.series}
+                    type="pie"
+                    width={400}
+                    height={300}
+                  />
+                )}
               </div>
             </div>
           </div>

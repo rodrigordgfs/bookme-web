@@ -11,7 +11,7 @@ const NavBar = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const FirtName = user.name.split(" ")[0];
+  const FirtName = user?.name.split(" ")[0];
 
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -31,7 +31,7 @@ const NavBar = () => {
           <IoMenu className="w-7 h-7 text-white group-hover:text-blue-500 transition-all cursor-pointer" />
         </button>
         <Link to="/">
-          <img src="/logo-text-white.svg" className="h-10" />
+          <img src="/logo-text-white.svg" className="h-10 my-3" />
         </Link>
       </div>
       <div
