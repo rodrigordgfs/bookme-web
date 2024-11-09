@@ -1,8 +1,7 @@
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import "react-date-range/dist/styles.css";
-import "react-date-range/dist/theme/default.css";
+import 'react-loading-skeleton/dist/skeleton.css'
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
