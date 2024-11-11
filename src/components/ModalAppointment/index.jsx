@@ -30,6 +30,7 @@ const ModalAppointment = ({
   const [profissionals, setProfissionals] = useState([]);
   const [loadingProfissionals, setLoadingProfissionals] = useState(false);
   const [services, setServices] = useState([]);
+  const [status, setStatus] = useState("");
   const [loadingServices, setLoadingServices] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -71,6 +72,7 @@ const ModalAppointment = ({
         professionalServiceId: selectedProfissionalService.id,
         clientId: selectedClient.id,
         dateTime: `${selectedDate}T${selectedTime}:00`,
+        status,
         observation,
       },
       user.token
@@ -186,6 +188,7 @@ const ModalAppointment = ({
       setSelectedDate(selectedAppointment.date);
       setSelectedTime(selectedAppointment.hour);
       setObservation(selectedAppointment.observation || "");
+      setStatus(selectedAppointment.status);
     } else {
       setSelectedClient(null);
       setSelectedProfissional(null);
@@ -193,6 +196,7 @@ const ModalAppointment = ({
       setSelectedDate("");
       setSelectedTime("");
       setObservation("");
+      setStatus("");
     }
   }, [selectedAppointment, handleLoadProfessionalServices]);
 
@@ -214,6 +218,23 @@ const ModalAppointment = ({
             selectedAppointment ? handleEditAppointment : handleSaveAppointment
           }
         >
+          {selectedAppointment && (
+            <div className="flex flex-col">
+              <p>Status</p>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
+                disabled={loading}
+              >
+                <option value="">Selecione o Status</option>
+                <option value="pending">Pendente</option>
+                <option value="confirmed">Confirmado</option>
+                <option value="completed">Completo</option>
+                <option value="canceled">Cancelado</option>
+              </select>
+            </div>
+          )}
           <div className="flex flex-col">
             <p>Cliente</p>
             <ClientSelect

@@ -52,6 +52,7 @@ const Appointments = () => {
           }),
           date: moment(new Date(appointment.dateTime)).format("YYYY-MM-DD"),
           hour: moment(new Date(appointment.dateTime)).format("HH:mm"),
+          status: appointment.status,
           observation: appointment.observation,
           client: {
             id: appointment.client.id,
@@ -83,6 +84,24 @@ const Appointments = () => {
         }
       });
   }, [user.token]);
+
+  const eventStyleGetter = (event) => {
+    let backgroundColor = "#3174ad";
+    if (event.status === "completed") backgroundColor = "#65A30D";
+    else if (event.status === "confirmed") backgroundColor = "#2563EB";
+    else if (event.status === "pending") backgroundColor = "#52525B";
+    else if (event.status === "canceled") backgroundColor = "#DC2626";
+
+    return {
+      style: {
+        backgroundColor,
+        color: "white",
+        borderRadius: "4px",
+        border: "none",
+        display: "block",
+      },
+    };
+  };
 
   useEffect(() => {
     handleLoadAppointments();
@@ -133,6 +152,7 @@ const Appointments = () => {
         onSelectEvent={(event) => handleOpenAppointment(event)}
         style={{ height: calendarHeight }}
         defaultView={defaultView}
+        eventPropGetter={eventStyleGetter}
         messages={{
           next: "Próximo",
           previous: "Anterior",
