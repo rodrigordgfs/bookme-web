@@ -12,7 +12,7 @@ const ServiceSelect = ({
   const dropdownRef = useRef(null);
 
   const filteredServices = services.filter((service) =>
-    String(service.service.name)
+    String(service?.service?.name || service.name)
       .toLowerCase()
       .includes(String(search).toLowerCase())
   );
@@ -20,7 +20,7 @@ const ServiceSelect = ({
   const handleSelect = (service) => {
     onChange(service);
     setIsDropdownOpen(false);
-    setSearch(service.service.name); // Atualiza o campo de pesquisa com o nome do serviço
+    setSearch(service?.service?.name || service.name); // Atualiza o campo de pesquisa com o nome do serviço
   };
 
   const handleClickOutside = (event) => {
@@ -39,14 +39,14 @@ const ServiceSelect = ({
   useEffect(() => {
     if (serviceSelected) {
       // Verificar se 'serviceSelected' tem o formato esperado e atualizar corretamente o estado
-      setSearch(serviceSelected.service?.name || ""); // Acesse o nome do serviço de maneira segura
+      setSearch(serviceSelected.service?.name || service?.name || ""); // Acesse o nome do serviço de maneira segura
     } else {
       setSearch("");
     }
   }, [serviceSelected]); // Atualiza o estado sempre que o 'serviceSelected' mudar
 
   return (
-    <div ref={dropdownRef} className="relative">
+    <div ref={dropdownRef} className="relative w-full">
       <input
         type="text"
         value={search}
@@ -68,12 +68,12 @@ const ServiceSelect = ({
                 className="flex items-start gap-2 px-4 py-2 cursor-pointer hover:bg-zinc-100"
               >
                 <div>
-                  <span className="font-semibold">{service.service.name}</span>
+                  <span className="font-semibold">{service?.service?.name || service.name}</span>
                   <p className="text-sm text-zinc-500">
-                    {service.service.description}
+                    {service?.service?.description || service.description}
                   </p>
                   <span className="text-sm text-green-600">
-                    R$ {service.service.price.toFixed(2)}
+                    R$ {service?.service?.price.toFixed(2) || service.price.toFixed(2)}
                   </span>
                 </div>
               </div>

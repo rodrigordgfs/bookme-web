@@ -1,4 +1,11 @@
-import { IoClose, IoHomeOutline, IoCalendarOutline, IoPersonOutline } from "react-icons/io5";
+import {
+  IoClose,
+  IoHomeOutline,
+  IoCalendarOutline,
+  IoPersonOutline,
+} from "react-icons/io5";
+import { MdWork } from "react-icons/md";
+
 import { LuLayoutDashboard } from "react-icons/lu";
 import { Link, useLocation } from "react-router-dom";
 
@@ -53,26 +60,6 @@ const NavBarDrawerMenu = ({ isOpen, onClose }) => {
             </li>
             <li>
               <Link
-                to="/clients"
-                onClick={onClose}
-                className={`flex items-center px-3 py-2 rounded-md transition-colors ${
-                  location.pathname === "/clients"
-                    ? "text-blue-500 font-medium"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                <IoPersonOutline
-                  className={`w-5 h-5 mr-3 ${
-                    location.pathname === "/clients"
-                      ? "text-blue-500"
-                      : "text-gray-700"
-                  }`}
-                />
-                <span>Clientes</span>
-              </Link>
-            </li>
-            <li>
-              <Link
                 to="/appointments"
                 onClick={onClose}
                 className={`flex items-center px-3 py-2 rounded-md transition-colors ${
@@ -89,6 +76,46 @@ const NavBarDrawerMenu = ({ isOpen, onClose }) => {
                   }`}
                 />
                 <span>Appointments</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/profissionals"
+                onClick={onClose}
+                className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                  location.pathname === "/profissionals"
+                    ? "text-blue-500 font-medium"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <MdWork
+                  className={`w-5 h-5 mr-3 ${
+                    location.pathname === "/profissionals"
+                      ? "text-blue-500"
+                      : "text-gray-700"
+                  }`}
+                />
+                <span>Profissionais</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/clients"
+                onClick={onClose}
+                className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                  location.pathname === "/clients"
+                    ? "text-blue-500 font-medium"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <IoPersonOutline
+                  className={`w-5 h-5 mr-3 ${
+                    location.pathname === "/clients"
+                      ? "text-blue-500"
+                      : "text-gray-700"
+                  }`}
+                />
+                <span>Clientes</span>
               </Link>
             </li>
           </ul>

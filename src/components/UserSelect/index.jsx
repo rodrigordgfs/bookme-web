@@ -65,7 +65,7 @@ const UserSelect = ({
                 className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-zinc-100"
               >
                 <div
-                  className="w-8 h-8 flex items-center justify-center text-white font-bold rounded-full"
+                  className="w-8 h-8 flex items-center justify-center bg-zinc-400 text-white font-bold rounded-full"
                 >
                   {user.name.charAt(0)}
                 </div>

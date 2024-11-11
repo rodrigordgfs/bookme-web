@@ -6,6 +6,7 @@ import RegisterPage from "../pages/register";
 import HomePage from "../pages/home";
 import AppointmentsPage from "../pages/appointments";
 import ClientsPage from "../pages/clients";
+import ProfissionalsPage from "../pages/profissionals";
 
 const AppRoutes = () => {
   return (
@@ -15,6 +16,7 @@ const AppRoutes = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/profissionals" element={<ProfissionalsPage />} />
         </Route>
         <Route element={<NoAuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
