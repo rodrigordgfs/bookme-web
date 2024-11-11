@@ -11,8 +11,12 @@ import { endOfMonth, startOfMonth, subMonths } from "date-fns";
 const HomePage = () => {
   const { user } = useContext(AuthContext);
 
-  const [dateRangeStart, setDateRangeStart] = useState(moment(startOfMonth(subMonths(new Date(), 1))).format("YYYY-MM-DD"));
-  const [dateRangeEnd, setDateRangeEnd] = useState(moment(endOfMonth(new Date())).format("YYYY-MM-DD"));
+  const [dateRangeStart, setDateRangeStart] = useState(
+    moment(startOfMonth(subMonths(new Date(), 1))).format("YYYY-MM-DD")
+  );
+  const [dateRangeEnd, setDateRangeEnd] = useState(
+    moment(endOfMonth(new Date())).format("YYYY-MM-DD")
+  );
   const [periodRecept, setPeriodRecept] = useState({
     series: [
       {
@@ -89,113 +93,96 @@ const HomePage = () => {
   ] = useState(0);
 
   const handleLoadDashboard = useCallback(() => {
-    setLoadingDashboard(true);
+    if (!user?.token) return;
 
-    if (user?.token) {
-      Promise.all([
-        DashboardService.getTotalMonth(user?.token),
-        DashboardService.getAppointmentsMonth(user?.token),
-        DashboardService.getAppointmentsDay(user?.token),
-        DashboardService.getAppointmentsInterval(
-          {
-            start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
-            end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
-          },
-          user?.token
-        ),
-        DashboardService.getServicesInterval(
-          {
-            start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
-            end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
-          },
-          user?.token
-        ),
-        DashboardService.getAppointmentsCanceled(user?.token),
-      ])
-        .then(
-          ([
-            { data: totalMonth },
-            { data: appointmentsMonth },
-            { data: appointmentsDay },
-            { data: appointmentsInterval },
-            { data: servicesInterval },
-            { data: appointmentsCanceled },
-          ]) => {
-            setTotalRecept(totalMonth.amount);
-            setTotalReceptPercentageChange(totalMonth.percentageChange);
-            setTotalAppointmentsMonth(appointmentsMonth.appointments);
-            setTotalAppointmentsPercentageChange(
-              appointmentsMonth.percentageChange
-            );
-            setTotalAppointmentsDay(appointmentsDay.appointments);
-            setTotalAppointmentsDayPercentageChange(
-              appointmentsDay.percentageChange
-            );
-            setPeriodRecept({
-              series: [
+    setLoadingDashboard(true);
+    Promise.all([
+      DashboardService.getTotalMonth(user.token),
+      DashboardService.getAppointmentsMonth(user.token),
+      DashboardService.getAppointmentsDay(user.token),
+      DashboardService.getAppointmentsInterval(
+        {
+          start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
+          end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
+        },
+        user.token
+      ),
+      DashboardService.getServicesInterval(
+        {
+          start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
+          end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
+        },
+        user.token
+      ),
+      DashboardService.getAppointmentsCanceled(user.token),
+    ])
+      .then(
+        ([
+          { data: totalMonth },
+          { data: appointmentsMonth },
+          { data: appointmentsDay },
+          { data: appointmentsInterval },
+          { data: servicesInterval },
+          { data: appointmentsCanceled },
+        ]) => {
+          setTotalRecept(totalMonth.amount);
+          setTotalReceptPercentageChange(totalMonth.percentageChange);
+          setTotalAppointmentsMonth(appointmentsMonth.appointments);
+          setTotalAppointmentsPercentageChange(
+            appointmentsMonth.percentageChange
+          );
+          setTotalAppointmentsDay(appointmentsDay.appointments);
+          setTotalAppointmentsDayPercentageChange(
+            appointmentsDay.percentageChange
+          );
+          setPeriodRecept({
+            series: [
+              {
+                name: "Receita",
+                data: Object.values(appointmentsInterval).map(
+                  (item) => item.totalAmount
+                ),
+              },
+            ],
+            options: {
+              chart: { height: 400, type: "line", zoom: { enabled: false } },
+              dataLabels: { enabled: false },
+              stroke: { curve: "straight" },
+              grid: {
+                row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
+              },
+              xaxis: { categories: Object.keys(appointmentsInterval) },
+            },
+          });
+          setPopularServices({
+            series: Object.values(servicesInterval).map((item) => item) || [],
+            options: {
+              chart: { width: 400, type: "pie" },
+              labels: Object.keys(servicesInterval) || [],
+              responsive: [
                 {
-                  name: "Receita",
-                  data: Object.values(appointmentsInterval).map(
-                    (item) => item.totalAmount
-                  ),
+                  breakpoint: 480,
+                  options: {
+                    chart: { width: 200 },
+                    legend: { position: "bottom" },
+                  },
                 },
               ],
-              options: {
-                chart: {
-                  height: 400,
-                  type: "line",
-                  zoom: { enabled: false },
-                },
-                dataLabels: { enabled: false },
-                stroke: { curve: "straight" },
-                grid: {
-                  row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
-                },
-                xaxis: {
-                  categories: Object.keys(appointmentsInterval),
-                },
-              },
-            });
-
-            setPopularServices({
-              series: Object.values(servicesInterval).map((item) => item) || [],
-              options: {
-                chart: {
-                  width: 400,
-                  type: "pie",
-                },
-                labels: Object.keys(servicesInterval) || [],
-                responsive: [
-                  {
-                    breakpoint: 480,
-                    options: {
-                      chart: {
-                        width: 200,
-                      },
-                      legend: {
-                        position: "bottom",
-                      },
-                    },
-                  },
-                ],
-              },
-            });
-            setLoadingDashboard(false);
-            setTotalCancellationsMonth(appointmentsCanceled.appointments);
-            setTotalAppointmentsCanceledPercentageChange(
-              appointmentsCanceled.percentageChange
-            );
-          }
-        )
-        .catch((error) => {
-          console.log(error);
-          if (error.response?.data?.error) {
-            return toast.error(error.response.data.error);
-          } else {
-            toast.error("Erro ao buscar os dados!");
-          }
-        });
-    }
+            },
+          });
+          setTotalCancellationsMonth(appointmentsCanceled.appointments);
+          setTotalAppointmentsCanceledPercentageChange(
+            appointmentsCanceled.percentageChange
+          );
+        }
+      )
+      .catch((error) => {
+        console.error(error);
+        toast.error(error.response?.data?.error || "Erro ao buscar os dados!");
+      })
+      .finally(() => {
+        setLoadingDashboard(false);
+      });
   }, [user?.token, dateRangeStart, dateRangeEnd]);
 
   useEffect(() => {
@@ -245,6 +232,7 @@ const HomePage = () => {
             <CardDashboard
               title="Receita total (mês)"
               value={totalRecept}
+              money={true}
               percentage={totalReceptPercentageChange}
               percentageText="em relação ao mês passado"
             />
