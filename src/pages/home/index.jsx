@@ -1,13 +1,11 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { MdAttachMoney } from "react-icons/md";
 import moment from "moment";
 import ReactApexChart from "react-apexcharts";
 import DashboardService from "../../services/dashboard";
 import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
-import formatMoneyBRL from "../../utils/formatMoneyBRL";
 import Skeleton from "react-loading-skeleton";
-import { MdOutlineMoodBad } from "react-icons/md";
+import CardDashboard from "../../components/CardDashboard";
 
 const HomePage = () => {
   const { user } = useContext(AuthContext);
@@ -84,107 +82,119 @@ const HomePage = () => {
     setTotalAppointmentsDayPercentageChange,
   ] = useState(0);
   const [totalCancellationsMonth, setTotalCancellationsMonth] = useState(0);
+  const [
+    totalAppointmentsCanceledPercentageChange,
+    setTotalAppointmentsCanceledPercentageChange,
+  ] = useState(0);
 
   const handleLoadDashboard = useCallback(() => {
     setLoadingDashboard(true);
 
-    Promise.all([
-      DashboardService.getTotalMonth(user?.token),
-      DashboardService.getAppointmentsMonth(user?.token),
-      DashboardService.getAppointmentsDay(user?.token),
-      DashboardService.getAppointmentsInterval(
-        {
-          start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
-          end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
-        },
-        user?.token
-      ),
-      DashboardService.getServicesInterval(
-        {
-          start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
-          end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
-        },
-        user?.token
-      ),
-    ])
-      .then(
-        ([
-          { data: totalMonth },
-          { data: appointmentsMonth },
-          { data: appointmentsDay },
-          { data: appointmentsInterval },
-          { data: servicesInterval },
-        ]) => {
-          setTotalRecept(totalMonth.amount);
-          setTotalReceptPercentageChange(totalMonth.percentageChange);
-          setTotalAppointmentsMonth(appointmentsMonth.appointments);
-          setTotalAppointmentsPercentageChange(
-            appointmentsMonth.percentageChange
-          );
-          setTotalAppointmentsDay(appointmentsDay.appointments);
-          setTotalAppointmentsDayPercentageChange(
-            appointmentsDay.percentageChange
-          );
-          setPeriodRecept({
-            series: [
-              {
-                name: "Receita",
-                data: Object.values(appointmentsInterval).map(
-                  (item) => item.totalAmount
-                ),
-              },
-            ],
-            options: {
-              chart: {
-                height: 400,
-                type: "line",
-                zoom: { enabled: false },
-              },
-              dataLabels: { enabled: false },
-              stroke: { curve: "straight" },
-              grid: {
-                row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
-              },
-              xaxis: {
-                categories: Object.keys(appointmentsInterval),
-              },
-            },
-          });
-
-          setPopularServices({
-            series: Object.values(servicesInterval).map((item) => item) || [],
-            options: {
-              chart: {
-                width: 400,
-                type: "pie",
-              },
-              labels: Object.keys(servicesInterval) || [],
-              responsive: [
+    if (user?.token) {
+      Promise.all([
+        DashboardService.getTotalMonth(user?.token),
+        DashboardService.getAppointmentsMonth(user?.token),
+        DashboardService.getAppointmentsDay(user?.token),
+        DashboardService.getAppointmentsInterval(
+          {
+            start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
+            end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
+          },
+          user?.token
+        ),
+        DashboardService.getServicesInterval(
+          {
+            start_date: moment(dateRangeStart).format("YYYY-MM-DD"),
+            end_date: moment(dateRangeEnd).format("YYYY-MM-DD"),
+          },
+          user?.token
+        ),
+        DashboardService.getAppointmentsCanceled(user?.token),
+      ])
+        .then(
+          ([
+            { data: totalMonth },
+            { data: appointmentsMonth },
+            { data: appointmentsDay },
+            { data: appointmentsInterval },
+            { data: servicesInterval },
+            { data: appointmentsCanceled },
+          ]) => {
+            setTotalRecept(totalMonth.amount);
+            setTotalReceptPercentageChange(totalMonth.percentageChange);
+            setTotalAppointmentsMonth(appointmentsMonth.appointments);
+            setTotalAppointmentsPercentageChange(
+              appointmentsMonth.percentageChange
+            );
+            setTotalAppointmentsDay(appointmentsDay.appointments);
+            setTotalAppointmentsDayPercentageChange(
+              appointmentsDay.percentageChange
+            );
+            setPeriodRecept({
+              series: [
                 {
-                  breakpoint: 480,
-                  options: {
-                    chart: {
-                      width: 200,
-                    },
-                    legend: {
-                      position: "bottom",
-                    },
-                  },
+                  name: "Receita",
+                  data: Object.values(appointmentsInterval).map(
+                    (item) => item.totalAmount
+                  ),
                 },
               ],
-            },
-          });
-          setLoadingDashboard(false);
-        }
-      )
-      .catch((error) => {
-        console.log(error);
-        if (error.response?.data?.error) {
-          return toast.error(error.response.data.error);
-        } else {
-          toast.error("Erro ao buscar os dados!");
-        }
-      });
+              options: {
+                chart: {
+                  height: 400,
+                  type: "line",
+                  zoom: { enabled: false },
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: "straight" },
+                grid: {
+                  row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
+                },
+                xaxis: {
+                  categories: Object.keys(appointmentsInterval),
+                },
+              },
+            });
+
+            setPopularServices({
+              series: Object.values(servicesInterval).map((item) => item) || [],
+              options: {
+                chart: {
+                  width: 400,
+                  type: "pie",
+                },
+                labels: Object.keys(servicesInterval) || [],
+                responsive: [
+                  {
+                    breakpoint: 480,
+                    options: {
+                      chart: {
+                        width: 200,
+                      },
+                      legend: {
+                        position: "bottom",
+                      },
+                    },
+                  },
+                ],
+              },
+            });
+            setLoadingDashboard(false);
+            setTotalCancellationsMonth(appointmentsCanceled.appointments);
+            setTotalAppointmentsCanceledPercentageChange(
+              appointmentsCanceled.percentageChange
+            );
+          }
+        )
+        .catch((error) => {
+          console.log(error);
+          if (error.response?.data?.error) {
+            return toast.error(error.response.data.error);
+          } else {
+            toast.error("Erro ao buscar os dados!");
+          }
+        });
+    }
   }, [user?.token, dateRangeStart, dateRangeEnd]);
 
   useEffect(() => {
@@ -231,76 +241,38 @@ const HomePage = () => {
       ) : (
         <>
           <div className="flex flex-col md:flex-row gap-2">
-            <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
-              <div className="flex flex-row justify-between items-center gap-2">
-                <h2 className="text-md font-medium">Receita total (mês)</h2>
-                <MdAttachMoney className="h-5 w-5" />
-              </div>
-              <p className="text-lg font-semibold">
-                {formatMoneyBRL(totalRecept)}
-              </p>
-              <p className="text-xs">
-                {totalReceptPercentageChange === 0 ? (
-                  <span className="font-medium">0%</span>
-                ) : totalReceptPercentageChange > 0 ? (
-                  <span className="text-green-600 font-medium">{`+${totalReceptPercentageChange}%`}</span>
-                ) : (
-                  <span className="text-red-600 font-medium">{`-${totalReceptPercentageChange}%`}</span>
-                )}{" "}
-                em relação ao mês passado
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
-              <div className="flex flex-row justify-between items-center gap-2">
-                <h2 className="text-md font-medium">Agendamentos (mês)</h2>
-                <MdAttachMoney className="h-5 w-5" />
-              </div>
-              <p className="text-lg font-semibold">{totalAppointmentsMonth}</p>
-              <p className="text-xs">
-                {totalAppointmentsPercentageChange === 0 ? (
-                  <span className="font-medium">0%</span>
-                ) : totalAppointmentsPercentageChange > 0 ? (
-                  <span className="text-green-600 font-medium">{`+${totalAppointmentsPercentageChange}%`}</span>
-                ) : (
-                  <span className="text-red-600 font-medium">{`-${totalAppointmentsPercentageChange}%`}</span>
-                )}{" "}
-                em relação ao mês passado
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
-              <div className="flex flex-row justify-between items-center gap-2">
-                <h2 className="text-md font-medium">Agendamentos (dia)</h2>
-                <MdAttachMoney className="h-5 w-5" />
-              </div>
-              <p className="text-lg font-semibold">{totalAppointmentsDay}</p>
-              <p className="text-xs">
-                {totalAppointmentsDayPercentageChange === 0 ? (
-                  <span className="font-medium">0%</span>
-                ) : totalAppointmentsDayPercentageChange > 0 ? (
-                  <span className="text-green-600 font-medium">{`+${totalAppointmentsDayPercentageChange}%`}</span>
-                ) : (
-                  <span className="text-red-600 font-medium">{`-${totalAppointmentsDayPercentageChange}%`}</span>
-                )}{" "}
-                em relação a ontem
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
-              <div className="flex flex-row justify-between items-center gap-2">
-                <h2 className="text-md font-medium">Cancelamentos (mês)</h2>
-                <MdAttachMoney className="h-5 w-5" />
-              </div>
-              <p className="text-lg font-semibold">{totalCancellationsMonth}</p>
-              <p className="text-xs">
-                <span className="text-red-600 font-medium">+252.51%</span> em
-                relação ao mês passado
-              </p>
-            </div>
+            <CardDashboard
+              title="Receita total (mês)"
+              value={totalRecept}
+              percentage={totalReceptPercentageChange}
+              percentageText="em relação ao mês passado"
+            />
+            <CardDashboard
+              title="Agendamentos (mês)"
+              value={totalAppointmentsMonth}
+              percentage={totalAppointmentsPercentageChange}
+              percentageText="em relação ao mês passado"
+            />
+            <CardDashboard
+              title="Agendamentos (dia)"
+              value={totalAppointmentsDay}
+              percentage={totalAppointmentsDayPercentageChange}
+              percentageText="em relação a ontem"
+            />
+            <CardDashboard
+              title="Cancelamentos (mês)"
+              value={totalCancellationsMonth}
+              percentage={totalAppointmentsCanceledPercentageChange}
+              percentageText="em relação ao mês passado"
+            />
           </div>
           <div className="flex flex-col md:flex-row gap-2 mt-2">
             <div className="flex flex-col gap-2 flex-1 border border-zinc-400 rounded-lg p-5">
               <div className="flex flex-col md:flex-row justify-between items-center gap-2">
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-md font-medium text-center md:text-start">Receita no período</h2>
+                  <h2 className="text-md font-medium text-center md:text-start">
+                    Receita no período
+                  </h2>
                   <p className="text-sm text-zinc-600 text-center md:text-start">
                     Receita diária no período
                   </p>
@@ -339,7 +311,9 @@ const HomePage = () => {
             </div>
             <div className="flex flex-col gap-2 max-w-[420px] w-full border border-zinc-400 rounded-lg p-5">
               <div className="flex flex-col gap-1">
-                <h2 className="text-md font-medium text-center md:text-start">Serviços populares</h2>
+                <h2 className="text-md font-medium text-center md:text-start">
+                  Serviços populares
+                </h2>
                 <p className="text-sm text-zinc-600 text-center md:text-start">
                   Serviços mais utilizados neste mês
                 </p>

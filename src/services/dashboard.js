@@ -51,6 +51,14 @@ class DashbaordService extends AxiosServices {
       params
     });
   }
+
+  getAppointmentsCanceled(token) {
+    return this.axios.get(`${this.url}/appointments-canceled`, {
+      headers: {
+        Authorization: `JWT ${token}`,
+      }
+    });
+  }
 }
 
 export default new DashbaordService();
