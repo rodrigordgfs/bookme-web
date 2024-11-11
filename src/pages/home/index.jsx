@@ -6,12 +6,13 @@ import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
 import Skeleton from "react-loading-skeleton";
 import CardDashboard from "../../components/CardDashboard";
+import { endOfMonth, startOfMonth, subMonths } from "date-fns";
 
 const HomePage = () => {
   const { user } = useContext(AuthContext);
 
-  const [dateRangeStart, setDateRangeStart] = useState(new Date());
-  const [dateRangeEnd, setDateRangeEnd] = useState(new Date());
+  const [dateRangeStart, setDateRangeStart] = useState(moment(startOfMonth(subMonths(new Date(), 1))).format("YYYY-MM-DD"));
+  const [dateRangeEnd, setDateRangeEnd] = useState(moment(endOfMonth(new Date())).format("YYYY-MM-DD"));
   const [periodRecept, setPeriodRecept] = useState({
     series: [
       {
