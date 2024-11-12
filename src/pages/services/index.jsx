@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import ServiceService from "../../services/services";
 import formatMoneyBRL from "../../utils/formatMoneyBRL";
 import ModalService from "../../components/ModalService/inde";
+import Header from "../../components/Header";
 
 
 const ServicesPage = () => {
@@ -51,23 +52,12 @@ const ServicesPage = () => {
 
   return (
     <div className="flex flex-col w-full max-w-full p-4">
-      {/* Título e botão */}
-      <div className="flex flex-col gap-2 md:gap-0 md:flex-row h-36 md:h-20 items-center justify-center md:justify-between">
-        <div className="flex flex-col gap-2 md:gap-0">
-          <h1 className="text-2xl font-medium md:text-start text-center">
-            Serviços
-          </h1>
-          <p className="text-sm text-zinc-600 md:text-start text-center">
-            Visualize todos os seus serviços
-          </p>
-        </div>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md w-full md:w-auto"
-          onClick={handleNewService}
-        >
-          Novo Serviço
-        </button>
-      </div>
+      <Header
+        title="Serviços"
+        subtitle="Visualize todos os seus serviços"
+        actionTitle="Novo Serviço"
+        onAction={handleNewService}
+      />
 
       {/* Modo Desktop - Tabela */}
       <div className="hidden md:block mt-6">

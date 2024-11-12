@@ -5,6 +5,7 @@ import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
 import ProfissionalsService from "../../services/profissionals";
 import ServicesService from "../../services/services";
+import Header from "../../components/Header";
 
 const ProfissionalsPage = () => {
   const { user } = useContext(AuthContext);
@@ -52,23 +53,12 @@ const ProfissionalsPage = () => {
 
   return (
     <div className="flex flex-col w-full max-w-full p-4">
-      {/* Título e botão */}
-      <div className="flex flex-col gap-2 md:gap-0 md:flex-row h-36 md:h-20 items-center justify-center md:justify-between">
-        <div className="flex flex-col gap-2 md:gap-0">
-          <h1 className="text-2xl font-medium md:text-start text-center">
-            Profissionais
-          </h1>
-          <p className="text-sm text-zinc-600 md:text-start text-center">
-            Visualize todos os seus profissionais
-          </p>
-        </div>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md w-full md:w-auto"
-          onClick={handleNewProfissional}
-        >
-          Novo Profissional
-        </button>
-      </div>
+      <Header
+        title="Profissionais"
+        subtitle="Visualize todos os seus profissionais"
+        actionTitle="Novo Profissional"
+        onAction={handleNewProfissional}
+      />
 
       {/* Modo Desktop - Tabela */}
       <div className="hidden md:block mt-6">

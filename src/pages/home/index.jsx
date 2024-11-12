@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import Skeleton from "react-loading-skeleton";
 import CardDashboard from "../../components/CardDashboard";
 import { endOfMonth, startOfMonth, subMonths } from "date-fns";
+import Header from "../../components/Header";
 
 const HomePage = () => {
   const { user } = useContext(AuthContext);
@@ -191,16 +192,11 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col w-full max-w-full p-4">
-      <div className="flex flex-col gap-2 md:gap-0 md:flex-row h-36 md:h-20 items-center justify-center md:justify-between">
-        <div className="flex flex-col gap-2 md:gap-0">
-          <h1 className="text-2xl font-medium md:text-start text-center">
-            Dashboard
-          </h1>
-          <p className="text-sm text-zinc-600 md:text-start text-center">
-            Visualize algumas métricas importantes
-          </p>
-        </div>
-      </div>
+      <Header
+        title="Dashboard"
+        subtitle="Visualize algumas métricas importantes"
+      />
+
       {loadingDashboard ? (
         <>
           <div className="flex flex-col md:flex-row gap-2">
