@@ -17,6 +17,22 @@ class ServicesService extends AxiosServices {
       },
     });
   }
+
+  postService(service, token) {
+    return this.axios.post(this.url, service, {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    });
+  }
+
+  patchService(service, token) {
+    return this.axios.patch(`${this.url}/${service.id}`, service, {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    });
+  }
 }
 
 export default new ServicesService();

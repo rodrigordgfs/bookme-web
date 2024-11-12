@@ -7,6 +7,7 @@ import HomePage from "../pages/home";
 import AppointmentsPage from "../pages/appointments";
 import ClientsPage from "../pages/clients";
 import ProfissionalsPage from "../pages/profissionals";
+import ServicesPage from "../pages/services";
 
 const AppRoutes = () => {
   return (
@@ -17,6 +18,7 @@ const AppRoutes = () => {
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/clients" element={<ClientsPage />} />
           <Route path="/profissionals" element={<ProfissionalsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
         </Route>
         <Route element={<NoAuthLayout />}>
           <Route path="/login" element={<LoginPage />} />

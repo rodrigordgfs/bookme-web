@@ -2,10 +2,10 @@ import {
   IoClose,
   IoHomeOutline,
   IoCalendarOutline,
-  IoPersonOutline,
+  IoPersonOutline
 } from "react-icons/io5";
 import { MdWork } from "react-icons/md";
-
+import { GrServices } from "react-icons/gr";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { Link, useLocation } from "react-router-dom";
 
@@ -116,6 +116,26 @@ const NavBarDrawerMenu = ({ isOpen, onClose }) => {
                   }`}
                 />
                 <span>Clientes</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/services"
+                onClick={onClose}
+                className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                  location.pathname === "/services"
+                    ? "text-blue-500 font-medium"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <GrServices
+                  className={`w-5 h-5 mr-3 ${
+                    location.pathname === "/services"
+                      ? "text-blue-500"
+                      : "text-gray-700"
+                  }`}
+                />
+                <span>Serviços</span>
               </Link>
             </li>
           </ul>
