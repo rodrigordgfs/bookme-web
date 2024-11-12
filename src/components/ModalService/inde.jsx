@@ -32,8 +32,10 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
 
     const newService = {
       name: serviceName,
-      price: Number(price),
-      duration: Number(duration),
+      // price: Number(price),
+      // duration: Number(duration),
+      price,
+      duration,
       description,
     };
 
@@ -43,8 +45,11 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
         closeModal();
       })
       .catch(({ response }) => {
+        console.log(response);
         if (response?.data?.error) {
           toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao cadastrar o serviço!");
         }
@@ -72,8 +77,11 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
         closeModal();
       })
       .catch(({ response }) => {
+        console.log(response);
         if (response?.data?.error) {
           toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao editar o serviço!");
         }

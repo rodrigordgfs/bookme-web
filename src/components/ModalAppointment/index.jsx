@@ -53,7 +53,9 @@ const ModalAppointment = ({
       .catch(({ response }) => {
         console.log(response);
         if (response?.data?.error) {
-          return toast.error(response.data.error);
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao criar o agendamento!");
         }
@@ -84,7 +86,9 @@ const ModalAppointment = ({
       .catch(({ response }) => {
         console.log(response);
         if (response?.data?.error) {
-          return toast.error(response.data.error);
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao editar o agendamento!");
         }
@@ -125,7 +129,9 @@ const ModalAppointment = ({
       .catch(({ response }) => {
         console.log(response);
         if (response?.data?.error) {
-          return toast.error(response.data.error);
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao buscar os clientes!");
         }
@@ -142,7 +148,9 @@ const ModalAppointment = ({
       .catch(({ response }) => {
         console.log(response);
         if (response?.data?.error) {
-          return toast.error(response.data.error);
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao buscar os profissionais!");
         }
@@ -163,7 +171,9 @@ const ModalAppointment = ({
         .catch(({ response }) => {
           console.log(response);
           if (response?.data?.error) {
-            return toast.error(response.data.error);
+            toast.error(response.data.error);
+          } else if (response?.data?.error[0]) {
+            toast.error(response.data.error[0].message);
           } else {
             toast.error("Erro ao buscar os serviços!");
           }

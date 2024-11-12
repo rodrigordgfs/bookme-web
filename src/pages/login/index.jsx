@@ -42,7 +42,9 @@ const LoginPage = () => {
       .catch(({ response }) => {
         console.log(response);
         if (response?.data?.error) {
-          return toast.error(response.data.error);
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao efetuar login!");
         }

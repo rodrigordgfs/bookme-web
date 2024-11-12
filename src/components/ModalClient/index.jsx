@@ -37,7 +37,9 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
       .catch(({ response }) => {
         console.log(response);
         if (response?.data?.error) {
-          return toast.error(response.data.error);
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao buscar os usuário!");
         }
@@ -103,7 +105,9 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
       .catch(({ response }) => {
         console.log(response);
         if (response?.data?.error) {
-          return toast.error(response.data.error);
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao cadastrar o cliente!");
         }
@@ -134,7 +138,9 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
       .catch(({ response }) => {
         console.log(response);
         if (response?.data?.error) {
-          return toast.error(response.data.error);
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
         } else {
           toast.error("Erro ao editar o cliente!");
         }
