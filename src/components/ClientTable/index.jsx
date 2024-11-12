@@ -1,4 +1,4 @@
-import { formatDate } from "date-fns";
+import { formatDate } from "../../utils/formatDate";
 import { formatPhone } from "../../utils/formatPhone";
 
 const ClientTable = ({ clients, onClickClient }) => {

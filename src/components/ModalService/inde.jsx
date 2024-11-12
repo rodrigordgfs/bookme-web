@@ -32,10 +32,8 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
 
     const newService = {
       name: serviceName,
-      // price: Number(price),
-      // duration: Number(duration),
-      price,
-      duration,
+      price: Number(price),
+      duration: Number(duration),
       description,
     };
 
@@ -45,7 +43,7 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
         closeModal();
       })
       .catch(({ response }) => {
-        console.log(response);
+        console.log(response.data.error);
         if (response?.data?.error) {
           toast.error(response.data.error);
         } else if (response?.data?.error[0]) {
@@ -183,7 +181,7 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
             Cancelar
           </button>
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+            className="bg-green-500 text-white px-4 py-2 rounded-md"
             type="submit"
             disabled={loading}
           >

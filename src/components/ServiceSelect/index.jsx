@@ -20,7 +20,7 @@ const ServiceSelect = ({
   const handleSelect = (service) => {
     onChange(service);
     setIsDropdownOpen(false);
-    setSearch(service?.service?.name || service.name); // Atualiza o campo de pesquisa com o nome do serviço
+    setSearch(service?.service?.name || service.name);
   };
 
   const handleClickOutside = (event) => {
@@ -37,13 +37,12 @@ const ServiceSelect = ({
   }, []);
 
   useEffect(() => {
-    if (serviceSelected) {
-      // Verificar se 'serviceSelected' tem o formato esperado e atualizar corretamente o estado
-      setSearch(serviceSelected.service?.name || service?.name || ""); // Acesse o nome do serviço de maneira segura
+    if (serviceSelected?.description) {
+      setSearch(serviceSelected.description);
     } else {
       setSearch("");
     }
-  }, [serviceSelected]); // Atualiza o estado sempre que o 'serviceSelected' mudar
+  }, [serviceSelected]);
 
   return (
     <div ref={dropdownRef} className="relative w-full">

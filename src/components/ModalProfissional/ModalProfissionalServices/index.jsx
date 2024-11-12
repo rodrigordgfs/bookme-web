@@ -101,7 +101,7 @@ const ModaProfissionalServices = ({ profissional }) => {
           disabled={loadingServices}
         />
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md w-1/4 disabled:cursor-not-allowed disabled:bg-blue-300"
+          className="bg-green-500 text-white px-4 py-2 rounded-md w-1/4 disabled:cursor-not-allowed disabled:bg-blue-300"
           onClick={handleSaveProfissionalService}
           disabled={!serviceSelected || loadingSavingService}
         >

@@ -17,6 +17,7 @@ const ClientsPage = () => {
 
   const handleCloseModal = () => {
     handleLoadClients();
+    setSelectedClient(null);
     setIsModalOpen(false);
   };
 
@@ -67,7 +68,6 @@ const ClientsPage = () => {
       <ModalClient
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
-        onClose={handleCloseModal}
         client={selectedClient}
       />
     </div>

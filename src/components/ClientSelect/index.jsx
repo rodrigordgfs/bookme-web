@@ -38,9 +38,8 @@ const ClientSelect = ({
   }, []);
 
   useEffect(() => {
-    // Atualiza o campo de pesquisa se um cliente estiver selecionado
-    if (clientSelected && clientSelected.user && clientSelected.user.name) {
-      setSearch(clientSelected.user.name);
+    if (clientSelected?.name) {
+      setSearch(clientSelected.name);
     } else {
       setSearch("");
     }

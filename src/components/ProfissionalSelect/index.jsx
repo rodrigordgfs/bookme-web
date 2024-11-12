@@ -37,13 +37,8 @@ const ProfissionalSelect = ({
   }, []);
 
   useEffect(() => {
-    // Verificar se o profissional selecionado existe e tem a estrutura correta
-    if (
-      professionalSelected &&
-      professionalSelected.user &&
-      professionalSelected.user.name
-    ) {
-      setSearch(professionalSelected.user.name);
+    if (professionalSelected?.name) {
+      setSearch(professionalSelected.name);
     } else {
       setSearch("");
     }

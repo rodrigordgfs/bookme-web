@@ -275,7 +275,7 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
             Cancelar
           </button>
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+            className="bg-green-500 text-white px-4 py-2 rounded-md"
             type="submit"
             disabled={loading}
           >
