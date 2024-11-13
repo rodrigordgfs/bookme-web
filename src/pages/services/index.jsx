@@ -5,7 +5,8 @@ import ServiceService from "../../services/services";
 import ModalService from "../../components/ModalService/inde";
 import Header from "../../components/Header";
 import ServiceTable from "../../components/ServiceTable";
-import ServiceCards from "../../components/ServiceCards";
+import FilterServices from "../../components/FilterServices";
+import ServiceTableSkeleton from "../../components/ServiceTableSkeleton";
 
 const ServicesPage = () => {
   const { user } = useContext(AuthContext);
@@ -29,24 +30,31 @@ const ServicesPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleLoadServices = useCallback(() => {
-    setLoadingServices(true);
-    ServiceService.getServices(user.token)
-      .then(({ data }) => {
-        setServices(data);
-        setLoadingServices(false);
+  const handleLoadServices = useCallback(
+    (name, price, duration) => {
+      setLoadingServices(true);
+      ServiceService.getServices(user.token, {
+        name: name || undefined,
+        price: price || undefined,
+        duration: duration || undefined,
       })
-      .catch(({ response }) => {
-        console.log(response);
-        if (response?.data?.error) {
-          toast.error(response.data.error);
-        } else if (response?.data?.error[0]) {
-          toast.error(response.data.error[0].message);
-        } else {
-          toast.error("Erro ao buscar os serviços!");
-        }
-      });
-  }, [user.token]);
+        .then(({ data }) => {
+          setServices(data);
+          setLoadingServices(false);
+        })
+        .catch(({ response }) => {
+          console.log(response);
+          if (response?.data?.error) {
+            toast.error(response.data.error);
+          } else if (response?.data?.error[0]) {
+            toast.error(response.data.error[0].message);
+          } else {
+            toast.error("Erro ao buscar os serviços!");
+          }
+        });
+    },
+    [user.token]
+  );
 
   useEffect(() => {
     handleLoadServices();
@@ -61,8 +69,18 @@ const ServicesPage = () => {
         onAction={handleNewService}
       />
 
-      <ServiceTable services={services} onClickService={handleEditService} />
-      <ServiceCards services={services} onClickService={handleEditService} />
+      <FilterServices
+        onFilter={(value) =>
+          handleLoadServices(value?.name, value?.price, value?.duration)
+        }
+        loading={loadingServices}
+      />
+
+      {loadingServices ? (
+        <ServiceTableSkeleton />
+      ) : (
+        <ServiceTable services={services} onClickService={handleEditService} />
+      )}
 
       <ModalService
         isModalOpen={isModalOpen}

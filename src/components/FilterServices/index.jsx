@@ -2,20 +2,20 @@ import { useState } from "react";
 import Collapsible from "../Collapsible";
 import { FaSpinner } from "react-icons/fa";
 
-const FilterProfissionals = ({ onFilter, loading }) => {
+const FilterServices = ({ onFilter, loading }) => {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [specialty, setSpecialty] = useState("");
+  const [price, setPrice] = useState("");
+  const [duration, setDuration] = useState("");
 
   const handleFilter = (e) => {
     e.preventDefault();
-    onFilter({ name, email, specialty });
+    onFilter({ name, price, duration });
   };
 
   const handleClearFields = () => {
     setName("");
-    setEmail("");
-    setSpecialty("");
+    setPrice("");
+    setDuration("");
     onFilter({});
   };
 
@@ -26,25 +26,25 @@ const FilterProfissionals = ({ onFilter, loading }) => {
           <input
             type="text"
             className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-            placeholder="Nome do Profissional"
+            placeholder="Nome do Cliente"
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={loading}
           />
           <input
-            type="text"
+            type="number"
             className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-            placeholder="E-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Preço"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
             disabled={loading}
           />
           <input
-            type="text"
+            type="number"
             className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-            placeholder="Especialidade"
-            value={specialty}
-            onChange={(e) => setSpecialty(e.target.value)}
+            placeholder="Duração"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
             disabled={loading}
           />
         </div>
@@ -74,4 +74,4 @@ const FilterProfissionals = ({ onFilter, loading }) => {
   );
 };
 
-export default FilterProfissionals;
+export default FilterServices;

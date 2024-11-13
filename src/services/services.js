@@ -10,11 +10,12 @@ class ServicesService extends AxiosServices {
     });
   }
 
-  getServices(token) {
+  getServices(token, params) {
     return this.axios.get(this.url, {
       headers: {
         Authorization: `JWT ${token}`,
       },
+      params,
     });
   }
 

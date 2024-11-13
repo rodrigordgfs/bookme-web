@@ -4,7 +4,7 @@ const ProfissionalTable = ({ profissionals, onClickProfissional }) => {
   return (
     <div className="mt-6">
       <table className="min-w-full table-auto">
-        <thead className="bg-gray-100">
+        <thead className="bg-gray-200">
           <tr>
             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
               Foto
