@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 import ClientService from "../../services/clients";
 import Header from "../../components/Header";
 import ClientTable from "../../components/ClientTable";
-import ClientCards from "../../components/ClientCards";
+import ClientTableSkeleton from "../../components/ClientTableSkeleton";
+import FilterClients from "../../components/FilterClients";
 
 const ClientsPage = () => {
   const { user } = useContext(AuthContext);
@@ -30,24 +31,32 @@ const ClientsPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleLoadClients = useCallback(() => {
-    setLoadingClients(true);
-    ClientService.getClients(user.token)
-      .then(({ data }) => {
-        setClients(data);
-        setLoadingClients(false);
+  const handleLoadClients = useCallback(
+    (name, email, phone) => {
+      setLoadingClients(true);
+      ClientService.getClients(user.token, {
+        name: name || undefined,
+        email: email || undefined,
+        phone: phone || undefined,
       })
-      .catch(({ response }) => {
-        console.log(response);
-        if (response?.data?.error) {
-          toast.error(response.data.error);
-        } else if (response?.data?.error[0]) {
-          toast.error(response.data.error[0].message);
-        } else {
-          toast.error("Erro ao buscar os clientes!");
-        }
-      });
-  }, [user.token]);
+        .then(({ data }) => {
+          setClients(data);
+          setLoadingClients(false);
+        })
+        .catch(({ response }) => {
+          console.log(response);
+          if (response?.data?.error) {
+            toast.error(response.data.error);
+          } else if (response?.data?.error[0]) {
+            toast.error(response.data.error[0].message);
+          } else {
+            toast.error("Erro ao buscar os clientes!");
+          }
+          setLoadingClients(false);
+        });
+    },
+    [user.token]
+  );
 
   useEffect(() => {
     handleLoadClients();
@@ -62,8 +71,18 @@ const ClientsPage = () => {
         onAction={handleNewClient}
       />
 
-      <ClientTable clients={clients} onClickClient={handleEditClient} />
-      <ClientCards clients={clients} onClickClient={handleEditClient} />
+      <FilterClients
+        onFilter={(value) =>
+          handleLoadClients(value?.name, value?.email, value?.phone)
+        }
+        loading={loadingClients}
+      />
+
+      {loadingClients ? (
+        <ClientTableSkeleton />
+      ) : (
+        <ClientTable clients={clients} onClickClient={handleEditClient} />
+      )}
 
       <ModalClient
         isModalOpen={isModalOpen}

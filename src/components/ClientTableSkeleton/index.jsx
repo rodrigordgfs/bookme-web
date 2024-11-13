@@ -1,19 +1,7 @@
-import { formatDate } from "../../utils/formatDate";
-import { formatPhone } from "../../utils/formatPhone";
+import Skeleton from "react-loading-skeleton";
 
-const ClientTable = ({ clients, onClickClient }) => {
-  const genderOptions = (gender) => {
-    switch (gender) {
-      case "M":
-        return "Masculino";
-      case "F":
-        return "Feminino";
-      case "O":
-        return "Outro";
-      default:
-        break;
-    }
-  };
+const ClientTableSkeleton = () => {
+  const skeletonRows = Array(5).fill(null);
 
   return (
     <div className="mt-6">
@@ -41,41 +29,28 @@ const ClientTable = ({ clients, onClickClient }) => {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {clients.map((client, index) => (
+          {skeletonRows.map((_, index) => (
             <tr
-              key={client.id}
-              className={`hover:bg-zinc-100 transition-all cursor-pointer ${
-                index % 2 === 0 ? "bg-gray-50" : "bg-white"
-              }`}
-              onClick={() => onClickClient(client)}
+              key={index}
+              className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
             >
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {client.photoUrl ? (
-                  <img
-                    src={client.photoUrl}
-                    alt={client.user.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 bg-zinc-300 rounded-full flex items-center justify-center">
-                    {client.user.name.charAt(0)}
-                  </div>
-                )}
+                <Skeleton circle={true} height={40} width={40} />
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {client.user.name}
+                <Skeleton width={100} />
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                {client.user.email}
+                <Skeleton width={150} />
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                {formatPhone(client.phone)}
+                <Skeleton width={100} />
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                {formatDate(client.birthDate)}
+                <Skeleton width={120} />
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                {genderOptions(client.gender)}
+                <Skeleton width={80} />
               </td>
             </tr>
           ))}
@@ -85,4 +60,4 @@ const ClientTable = ({ clients, onClickClient }) => {
   );
 };
 
-export default ClientTable;
+export default ClientTableSkeleton;
