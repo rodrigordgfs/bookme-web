@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 import ProfissionalsService from "../../services/profissionals";
 import Header from "../../components/Header";
 import ProfissionalTable from "../../components/ProfissionalTable";
-import ProfissionalCards from "../../components/ProfissionalCards";
+import FilterProfissionals from "../../components/FilterProfissionals";
+import ProfissionalTableSkeleton from "../../components/ProfissionalTableSkeleton";
 
 const ProfissionalsPage = () => {
   const { user } = useContext(AuthContext);
@@ -30,24 +31,31 @@ const ProfissionalsPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleLoadProfissionals = useCallback(() => {
-    setLoadingProfissionals(true);
-    ProfissionalsService.getProfissionals(user.token)
-      .then(({ data }) => {
-        setProfissionals(data);
-        setLoadingProfissionals(false);
+  const handleLoadProfissionals = useCallback(
+    (name, email, specialty) => {
+      setLoadingProfissionals(true);
+      ProfissionalsService.getProfissionals(user.token, {
+        name: name || undefined,
+        email: email || undefined,
+        specialty: specialty || undefined,
       })
-      .catch(({ response }) => {
-        console.log(response);
-        if (response?.data?.error) {
-          toast.error(response.data.error);
-        } else if (response?.data?.error[0]) {
-          toast.error(response.data.error[0].message);
-        } else {
-          toast.error("Erro ao buscar os profissionais!");
-        }
-      });
-  }, [user.token]);
+        .then(({ data }) => {
+          setProfissionals(data);
+          setLoadingProfissionals(false);
+        })
+        .catch(({ response }) => {
+          console.log(response);
+          if (response?.data?.error) {
+            toast.error(response.data.error);
+          } else if (response?.data?.error[0]) {
+            toast.error(response.data.error[0].message);
+          } else {
+            toast.error("Erro ao buscar os profissionais!");
+          }
+        });
+    },
+    [user.token]
+  );
 
   useEffect(() => {
     handleLoadProfissionals();
@@ -62,14 +70,21 @@ const ProfissionalsPage = () => {
         onAction={handleNewProfissional}
       />
 
-      <ProfissionalTable
-        profissionals={profissionals}
-        onClickProfissional={handleEditProfissional}
+      <FilterProfissionals
+        onFilter={(value) =>
+          handleLoadProfissionals(value?.name, value?.email, value?.specialty)
+        }
+        loading={loadingProfissionals}
       />
-      <ProfissionalCards
-        profissionals={profissionals}
-        onClickProfissional={handleEditProfissional}
-      />
+
+      {loadingProfissionals ? (
+        <ProfissionalTableSkeleton />
+      ) : (
+        <ProfissionalTable
+          profissionals={profissionals}
+          onClickProfissional={handleEditProfissional}
+        />
+      )}
 
       <ModalProfissional
         isModalOpen={isModalOpen}

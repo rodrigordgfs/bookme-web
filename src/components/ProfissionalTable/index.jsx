@@ -2,7 +2,7 @@ import { formatDate } from "../../utils/formatDate";
 
 const ProfissionalTable = ({ profissionals, onClickProfissional }) => {
   return (
-    <div className="hidden md:block mt-6">
+    <div className="mt-6">
       <table className="min-w-full table-auto">
         <thead className="bg-gray-100">
           <tr>
@@ -12,13 +12,13 @@ const ProfissionalTable = ({ profissionals, onClickProfissional }) => {
             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
               Nome
             </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500  hidden md:table-cell">
               E-mail
             </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500  hidden md:table-cell">
               Especialidade
             </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 hidden md:table-cell">
               Data de Nascimento
             </th>
           </tr>
@@ -46,13 +46,13 @@ const ProfissionalTable = ({ profissionals, onClickProfissional }) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {profissional.user.name}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                 {profissional.user.email}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                 {profissional.specialty}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                 {formatDate(profissional.birthDate)}
               </td>
             </tr>

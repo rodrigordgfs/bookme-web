@@ -11,14 +11,15 @@ class ProfissionalsService extends AxiosServices {
     });
   }
 
-  getProfissionals(token) {
+  getProfissionals(token, params) {
     return this.axios.get(this.url, {
       headers: {
         Authorization: `JWT ${token}`,
       },
       params: {
+        ...params,
         services: true,
-      }
+      },
     });
   }
 
@@ -47,19 +48,26 @@ class ProfissionalsService extends AxiosServices {
   }
 
   postProfessionalService(professionalId, serviceId, token) {
-    return this.axios.post(`${this.url}/${professionalId}/service/${serviceId}`, {}, {
-      headers: {
-        Authorization: `JWT ${token}`,
-      },
-    });
+    return this.axios.post(
+      `${this.url}/${professionalId}/service/${serviceId}`,
+      {},
+      {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+    );
   }
 
   deleteProfessionalService(professionalId, serviceId, token) {
-    return this.axios.delete(`${this.url}/${professionalId}/service/${serviceId}`, {
-      headers: {
-        Authorization: `JWT ${token}`,
-      },
-    });
+    return this.axios.delete(
+      `${this.url}/${professionalId}/service/${serviceId}`,
+      {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+    );
   }
 }
 

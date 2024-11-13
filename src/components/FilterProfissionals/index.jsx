@@ -2,20 +2,20 @@ import { useState } from "react";
 import Collapsible from "../Collapsible";
 import { FaSpinner } from "react-icons/fa";
 
-const FilterClients = ({ onFilter, loading }) => {
+const FilterProfissionals = ({ onFilter, loading }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [specialty, setSpecialty] = useState("");
 
   const handleFilter = (e) => {
     e.preventDefault();
-    onFilter({ name, email, phone });
+    onFilter({ name, email, specialty });
   };
 
   const handleClearFields = () => {
     setName("");
     setEmail("");
-    setPhone("");
+    setSpecialty("");
     onFilter({});
   };
 
@@ -42,9 +42,9 @@ const FilterClients = ({ onFilter, loading }) => {
           <input
             type="text"
             className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-            placeholder="Telefone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Especialidade"
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
             disabled={loading}
           />
         </div>
@@ -74,4 +74,4 @@ const FilterClients = ({ onFilter, loading }) => {
   );
 };
 
-export default FilterClients;
+export default FilterProfissionals;
