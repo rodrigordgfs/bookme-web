@@ -5,7 +5,7 @@ const Modal = ({ isOpen, onClose, title, subtitle, children }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-lg w-full shadow-lg">
+      <div className="bg-white p-6 rounded-lg max-w-lg w-full shadow-lg m-2">
         <div className="flex justify-between items-start mb-4">
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-semibold">{title}</h2>

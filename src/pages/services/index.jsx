@@ -15,6 +15,9 @@ const ServicesPage = () => {
   const [services, setServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   const handleCloseModal = () => {
     handleLoadServices();
@@ -31,15 +34,20 @@ const ServicesPage = () => {
   };
 
   const handleLoadServices = useCallback(
-    (name, price, duration) => {
+    (name, price, duration, page, itemsPerPage) => {
       setLoadingServices(true);
       ServiceService.getServices(user.token, {
         name: name || undefined,
         price: price || undefined,
         duration: duration || undefined,
+        page,
+        itemsPerPage,
       })
         .then(({ data }) => {
-          setServices(data);
+          setServices(data.data);
+          setTotalPages(Number(data.totalPages));
+          setCurrentPage(Number(data.currentPage));
+          setTotalItems(Number(data.totalItems));
           setLoadingServices(false);
         })
         .catch(({ response }) => {
@@ -79,7 +87,16 @@ const ServicesPage = () => {
       {loadingServices ? (
         <ServiceTableSkeleton />
       ) : (
-        <ServiceTable services={services} onClickService={handleEditService} />
+        <ServiceTable
+          services={services}
+          onClickService={handleEditService}
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={(page) => handleLoadServices(null, null, null, page)}
+          onItemsPerPageChange={(itemsPerPage) =>
+            handleLoadServices(null, null, null, 1, itemsPerPage)
+          }
+        />
       )}
 
       <ModalService

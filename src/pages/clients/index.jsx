@@ -15,6 +15,9 @@ const ClientsPage = () => {
   const [clients, setClients] = useState([]);
   const [loadingClients, setLoadingClients] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   const handleCloseModal = () => {
     handleLoadClients();
@@ -32,15 +35,20 @@ const ClientsPage = () => {
   };
 
   const handleLoadClients = useCallback(
-    (name, email, phone) => {
+    (name, email, phone, page, itemsPerPage) => {
       setLoadingClients(true);
       ClientService.getClients(user.token, {
         name: name || undefined,
         email: email || undefined,
         phone: phone || undefined,
+        page,
+        itemsPerPage,
       })
         .then(({ data }) => {
-          setClients(data);
+          setClients(data.data);
+          setTotalPages(Number(data.totalPages));
+          setCurrentPage(Number(data.currentPage));
+          setTotalItems(Number(data.totalItems));
           setLoadingClients(false);
         })
         .catch(({ response }) => {
@@ -81,7 +89,16 @@ const ClientsPage = () => {
       {loadingClients ? (
         <ClientTableSkeleton />
       ) : (
-        <ClientTable clients={clients} onClickClient={handleEditClient} />
+        <ClientTable
+          clients={clients}
+          onClickClient={handleEditClient}
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={(page) => handleLoadClients(null, null, null, page)}
+          onItemsPerPageChange={(itemsPerPage) =>
+            handleLoadClients(null, null, null, 1, itemsPerPage)
+          }
+        />
       )}
 
       <ModalClient

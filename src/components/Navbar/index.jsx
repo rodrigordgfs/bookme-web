@@ -4,6 +4,7 @@ import { AuthContext } from "../../contexts/auth";
 import { Link } from "react-router-dom";
 import NavBarDropDown from "../NavBarDropDown";
 import NavBarDrawerMenu from "../NavBarDrawerMenu";
+import { FaUser } from "react-icons/fa";
 
 const NavBar = () => {
   const { user } = useContext(AuthContext);
@@ -38,8 +39,8 @@ const NavBar = () => {
         className="hidden md:flex flex-row items-center gap-3 relative"
         ref={dropdownRef}
       >
-        <div className="w-7 h-7 rounded-full flex items-center justify-center">
-        <img src="https://github.com/rodrigordgfs.png" className="w-7 h-7" />
+        <div className="w-7 h-7 rounded-full flex items-center justify-center bg-white">
+          <FaUser className="w-4 h-4 text-blue-500" />
         </div>
         <span className="text-white ml-1">
           Olá, <strong>{FirtName}</strong>

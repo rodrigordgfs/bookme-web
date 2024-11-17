@@ -15,6 +15,9 @@ const ProfissionalsPage = () => {
   const [profissionals, setProfissionals] = useState([]);
   const [loadingProfissionals, setLoadingProfissionals] = useState(false);
   const [selectedProfissional, setSelectedProfissional] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   const handleCloseModal = () => {
     handleLoadProfissionals();
@@ -32,15 +35,20 @@ const ProfissionalsPage = () => {
   };
 
   const handleLoadProfissionals = useCallback(
-    (name, email, specialty) => {
+    (name, email, specialty, page, itemsPerPage) => {
       setLoadingProfissionals(true);
       ProfissionalsService.getProfissionals(user.token, {
         name: name || undefined,
         email: email || undefined,
         specialty: specialty || undefined,
+        page,
+        itemsPerPage,
       })
         .then(({ data }) => {
-          setProfissionals(data);
+          setProfissionals(data.data);
+          setTotalPages(Number(data.totalPages));
+          setCurrentPage(Number(data.currentPage));
+          setTotalItems(Number(data.totalItems));
           setLoadingProfissionals(false);
         })
         .catch(({ response }) => {
@@ -83,6 +91,14 @@ const ProfissionalsPage = () => {
         <ProfissionalTable
           profissionals={profissionals}
           onClickProfissional={handleEditProfissional}
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={(page) =>
+            handleLoadProfissionals(null, null, null, page)
+          }
+          onItemsPerPageChange={(itemsPerPage) =>
+            handleLoadProfissionals(null, null, null, 1, itemsPerPage)
+          }
         />
       )}
 
