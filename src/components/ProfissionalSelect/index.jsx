@@ -66,9 +66,9 @@ const ProfissionalSelect = ({
                 onClick={() => handleSelect(professional)}
                 className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-zinc-100"
               >
-                {professional.user.photoUrl ? (
+                {professional.user.photo ? (
                   <img
-                    src={professional.user.photoUrl}
+                    src={professional.user.photo}
                     alt={professional.user.name}
                     className="w-8 h-8 rounded-full"
                   />

@@ -1,10 +1,11 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { FaSpinner, FaUser } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 import { toast } from "react-toastify";
 import UserSelect from "../../UserSelect";
 import { AuthContext } from "../../../contexts/auth";
 import UserService from "../../../services/user";
 import ProfissionalService from "../../../services/profissionals";
+import Button from "../../Button";
 
 export const ModalProfissionalData = ({ profissional, closeModal }) => {
   const { user } = useContext(AuthContext);
@@ -120,7 +121,7 @@ export const ModalProfissionalData = ({ profissional, closeModal }) => {
     if (profissional) {
       setSelectedUser(profissional.user);
       setSpecialty(profissional.specialty);
-      setSelectedImage(profissional.photoUrl);
+      setSelectedImage(profissional.photo);
     } else {
       clearFields();
     }
@@ -131,7 +132,7 @@ export const ModalProfissionalData = ({ profissional, closeModal }) => {
       className="flex flex-col gap-2"
       onSubmit={profissional ? handleEditProfissional : handleSaveProfissional}
     >
-      <div className="flex flex-col mt-4 items-center">
+      <div className="flex flex-col gap-2 mt-4 items-center">
         {selectedImage ? (
           <img
             src={selectedImage}
@@ -143,14 +144,9 @@ export const ModalProfissionalData = ({ profissional, closeModal }) => {
             <FaUser className="w-16 h-16 text-gray-500" />
           </div>
         )}
-        <button
-          type="button"
-          onClick={openFileSelector}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md w-full md:w-auto mt-2"
-          disabled={loading}
-        >
+        <Button onClick={openFileSelector} disabled={loading} size="fit">
           Selecionar Foto
-        </button>
+        </Button>
         <input
           type="file"
           accept="image/jpeg, image/png"
@@ -182,21 +178,18 @@ export const ModalProfissionalData = ({ profissional, closeModal }) => {
         />
       </div>
 
-      <div className="mt-4 flex justify-end">
-        <button
+      <div className="mt-4 gap-2 flex justify-end">
+        <Button
           onClick={closeModal}
-          className="bg-red-500 text-white px-4 py-2 rounded-md mr-2"
           disabled={loading}
+          variant="danger"
+          size="fit"
         >
           Cancelar
-        </button>
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded-md"
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? <FaSpinner className="animate-spin mx-auto" /> : "Salvar"}
-        </button>
+        </Button>
+        <Button type="submit" disabled={loading} variant="success" size="fit">
+          Salvar
+        </Button>
       </div>
     </form>
   );

@@ -58,13 +58,13 @@ const Appointments = () => {
           client: {
             id: appointment.client.id,
             name: appointment.client.user.name,
-            photoUrl: null,
+            photo: null,
           },
           professional: {
             id: appointment.professionalService.professional.id,
             name: appointment.professionalService.professional.user.name,
             specialty: appointment.professionalService.professional.specialty,
-            photoUrl: null,
+            photo: null,
           },
           service: {
             id: appointment.professionalService.service.id,

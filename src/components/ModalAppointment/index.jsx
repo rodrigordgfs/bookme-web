@@ -123,7 +123,7 @@ const ModalAppointment = ({
     setLoadingClients(true);
     ClientService.getClients(user.token)
       .then(({ data }) => {
-        setClients(data);
+        setClients(data.data);
         setLoadingClients(false);
       })
       .catch(({ response }) => {
@@ -142,7 +142,7 @@ const ModalAppointment = ({
     setLoadingProfissionals(true);
     ProfissionalsService.getProfissionals(user.token)
       .then(({ data }) => {
-        setProfissionals(data);
+        setProfissionals(data.data);
         setLoadingProfissionals(false);
       })
       .catch(({ response }) => {
@@ -162,7 +162,7 @@ const ModalAppointment = ({
       setLoadingServices(true);
       ProfissionalsService.getProfessionalServices(professionalId, user.token)
         .then(({ data }) => {
-          setServices(data);
+          setServices(data.data);
           if (professionalService) {
             setSelectedProfissionalService(professionalService);
           }

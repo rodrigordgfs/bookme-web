@@ -42,9 +42,9 @@ const ProfissionalTable = ({
                 onClick={() => onClickProfissional(profissional)}
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {profissional.photoUrl ? (
+                  {profissional.photo ? (
                     <img
-                      src={profissional.photoUrl}
+                      src={profissional.photo}
                       alt={profissional.user.name}
                       className="w-10 h-10 rounded-full object-cover"
                     />

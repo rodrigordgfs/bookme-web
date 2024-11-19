@@ -1,3 +1,5 @@
+import Button from "../Button";
+
 const Header = ({ title, subtitle, actionTitle, onAction }) => {
   return (
     <div className="flex flex-col gap-2 md:gap-0 md:flex-row h-36 md:h-20 items-center justify-center md:justify-between">
@@ -10,12 +12,9 @@ const Header = ({ title, subtitle, actionTitle, onAction }) => {
         </p>
       </div>
       {actionTitle && (
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md w-full md:w-auto"
-          onClick={onAction}
-        >
+        <Button onClick={onAction} size="fit">
           {actionTitle}
-        </button>
+        </Button>
       )}
     </div>
   );

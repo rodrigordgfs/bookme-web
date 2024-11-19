@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Collapsible from "../Collapsible";
 import { FaSpinner } from "react-icons/fa";
+import Button from "../Button";
 
 const FilterServices = ({ onFilter, loading }) => {
   const [name, setName] = useState("");
@@ -49,25 +50,18 @@ const FilterServices = ({ onFilter, loading }) => {
           />
         </div>
         <div className="flex flex-row items-center justify-end gap-2">
-          <button
-            className="bg-red-500 disabled:bg-red-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md md:w-auto"
-            type="button"
+          <Button
             onClick={handleClearFields}
             disabled={loading}
+            type="button"
+            variant="danger"
+            size="fit"
           >
             Limpar
-          </button>
-          <button
-            className="bg-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md md:w-auto"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <FaSpinner className="animate-spin mx-auto w-5 h-5" />
-            ) : (
-              "Filtrar"
-            )}
-          </button>
+          </Button>
+          <Button disabled={loading} type="submit" size="fit">
+            Filtrar
+          </Button>
         </div>
       </form>
     </Collapsible>

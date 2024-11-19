@@ -4,6 +4,7 @@ import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 import ServiceService from "../../services/services";
+import Button from "../Button";
 
 const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
   const { user } = useContext(AuthContext);
@@ -172,25 +173,18 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
           />
         </div>
 
-        <div className="mt-4 flex justify-end">
-          <button
+        <div className="mt-4 gap-2 flex justify-end">
+          <Button
             onClick={closeModal}
-            className="bg-red-500 text-white px-4 py-2 rounded-md mr-2"
             disabled={loading}
+            variant="danger"
+            size="fit"
           >
             Cancelar
-          </button>
-          <button
-            className="bg-green-500 text-white px-4 py-2 rounded-md"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <FaSpinner className="animate-spin mx-auto" />
-            ) : (
-              "Salvar"
-            )}
-          </button>
+          </Button>
+          <Button type="submit" disabled={loading} variant="success" size="fit">
+            Salvar
+          </Button>
         </div>
       </form>
     </Modal>

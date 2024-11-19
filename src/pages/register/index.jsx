@@ -1,12 +1,12 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaSpinner } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import UserService from "../../services/user";
 import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
+import Button from "../../components/Button";
 
 const schema = z
   .object({
@@ -137,17 +137,9 @@ const RegisterPage = () => {
               </p>
             )}
 
-            <button
-              type="submit"
-              className="w-full h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-lg mt-2 transition-all"
-              disabled={loading}
-            >
-              {loading ? (
-                <FaSpinner className="animate-spin mx-auto" />
-              ) : (
-                "Cadastrar"
-              )}
-            </button>
+            <Button loading={loading} disabled={loading} type="submit">
+              Cadastrar
+            </Button>
           </form>
           <p className="font-normal text-center mt-8">
             Já tem uma conta{" "}

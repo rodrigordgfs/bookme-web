@@ -59,9 +59,9 @@ const ClientTable = ({
                 onClick={() => onClickClient(client)}
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {client.photoUrl ? (
+                  {client.photo ? (
                     <img
-                      src={client.photoUrl}
+                      src={client.photo}
                       alt={client.user.name}
                       className="w-10 h-10 rounded-full object-cover"
                     />

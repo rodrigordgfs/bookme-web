@@ -67,9 +67,9 @@ const ClientSelect = ({
                 onClick={() => handleSelect(client)}
                 className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-zinc-100"
               >
-                {client.photoUrl ? (
+                {client.photo ? (
                   <img
-                    src={client.photoUrl}
+                    src={client.photo}
                     alt={client.user.name}
                     className="w-8 h-8 rounded-full"
                   />

@@ -4,7 +4,8 @@ import UserSelect from "../UserSelect";
 import UserService from "../../services/user";
 import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
-import { FaSpinner, FaUser } from "react-icons/fa"; // Importando o ícone de usuário
+import { FaUser } from "react-icons/fa";
+import Button from "../Button";
 import moment from "moment";
 
 const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
@@ -160,7 +161,7 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
       setPhone(client.phone);
       setBirthDate(moment(client.birthDate).format("YYYY-MM-DD"));
       setGender(client.gender);
-      setSelectedImage(client.photoUrl);
+      setSelectedImage(client.photo);
     } else {
       clearFields();
     }
@@ -179,7 +180,7 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
         className="flex flex-col gap-2"
         onSubmit={client ? handleEditCliente : handleSaveCliente}
       >
-        <div className="flex flex-col mt-4 items-center">
+        <div className="flex flex-col mt-4 gap-2 items-center">
           {selectedImage ? (
             <img
               src={selectedImage}
@@ -191,14 +192,9 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
               <FaUser className="w-16 h-16 text-gray-500" />
             </div>
           )}
-          <button
-            type="button"
-            onClick={openFileSelector}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md w-full md:w-auto mt-2"
-            disabled={loading}
-          >
+          <Button onClick={openFileSelector} disabled={loading} size="fit">
             Selecionar Foto
-          </button>
+          </Button>
           <input
             type="file"
             accept="image/jpeg, image/png"
@@ -266,25 +262,18 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
           </select>
         </div>
 
-        <div className="mt-4 flex justify-end">
-          <button
+        <div className="mt-4 gap-2 flex justify-end">
+          <Button
             onClick={closeModal}
-            className="bg-red-500 text-white px-4 py-2 rounded-md mr-2"
             disabled={loading}
+            variant="danger"
+            size="fit"
           >
             Cancelar
-          </button>
-          <button
-            className="bg-green-500 text-white px-4 py-2 rounded-md"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <FaSpinner className="animate-spin mx-auto" />
-            ) : (
-              "Salvar"
-            )}
-          </button>
+          </Button>
+          <Button type="submit" disabled={loading} variant="success" size="fit">
+            Salvar
+          </Button>
         </div>
       </form>
     </Modal>
