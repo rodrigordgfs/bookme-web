@@ -27,8 +27,8 @@ class ServicesService extends AxiosServices {
     });
   }
 
-  patchService(service, token) {
-    return this.axios.patch(`${this.url}/${service.id}`, service, {
+  patchService(id, data, token) {
+    return this.axios.patch(`${this.url}/${id}`, data, {
       headers: {
         Authorization: `JWT ${token}`,
       },

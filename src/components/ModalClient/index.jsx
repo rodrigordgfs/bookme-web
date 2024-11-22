@@ -1,31 +1,79 @@
-import { useCallback, useContext, useEffect, useState, useRef } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Modal from "../Modal";
 import UserSelect from "../UserSelect";
 import UserService from "../../services/user";
 import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
-import { FaUser } from "react-icons/fa";
 import Button from "../Button";
 import moment from "moment";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import PhotoSelector from "../PhotoSelector";
+import InputField from "../InputField";
+import SelectField from "../SelectField";
+
+const schema = z.object({
+  photo: z.string().optional(),
+  userSelect: z
+    .object({
+      id: z.string().min(1, "Selecione um usuário válido"),
+    })
+    .refine((data) => data.id !== undefined, {
+      message: "O campo usuário é obrigatório",
+    }),
+  phone: z.string().min(10, "O telefone deve ter pelo menos 10 dígitos"),
+  birthDate: z.preprocess(
+    (input) => {
+      if (typeof input === "string" || input instanceof Date) {
+        const date = new Date(input);
+        return isNaN(date.getTime()) ? undefined : date;
+      }
+      return undefined;
+    },
+    z.date().refine((date) => date <= new Date(), {
+      message: "A data de nascimento não pode ser no futuro",
+    })
+  ),
+  gender: z.enum(["M", "F", "O"], {
+    errorMap: () => ({ message: "Selecione um gênero válido" }),
+  }),
+});
 
 const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
   const { user } = useContext(AuthContext);
 
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imageBase64, setImageBase64] = useState("");
-  const [phone, setPhone] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [gender, setGender] = useState("");
+  const [userSelected, setUserSelected] = useState(null);
 
-  const fileInputRef = useRef(null);
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    trigger,
+    getValues,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      userSelect: { id: "", name: "", email: "" },
+      phone: "",
+      birthDate: "",
+      gender: "",
+    },
+  });
+
+  const handleImageChange = (photo) => {
+    setValue("photo", photo);
+  };
 
   const closeModal = () => {
     handleCloseModal();
-    clearFields();
+    setUserSelected(null);
+    reset();
   };
 
   const handleLoadUsers = useCallback(() => {
@@ -47,52 +95,18 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
       });
   }, [user.token]);
 
-  const handleUserChange = (user) => {
-    setSelectedUser(user);
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-
-    if (
-      file &&
-      (file.type === "image/jpg" ||
-        file.type === "image/jpeg" ||
-        file.type === "image/png")
-    ) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageBase64(reader.result);
-        setSelectedImage(URL.createObjectURL(file));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      toast.error("Por favor, selecione uma imagem no formato JPG ou PNG.");
-    }
-  };
-
-  const openFileSelector = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const clearFields = () => {
-    setSelectedUser(null);
-    setPhone("");
-    setBirthDate("");
-    setGender("");
-    setImageBase64("");
-    setSelectedImage(null);
-  };
-
-  const handleSaveCliente = (e) => {
-    e.preventDefault();
+  const handleSaveCliente = ({
+    userSelect,
+    photo,
+    phone,
+    birthDate,
+    gender,
+  }) => {
     setLoading(true);
     UserService.postClient(
       {
-        id_user: selectedUser.id,
-        photo: imageBase64,
+        id_user: userSelect.id,
+        photo,
         phone,
         birthDate,
         gender,
@@ -118,14 +132,19 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
       });
   };
 
-  const handleEditCliente = (e) => {
-    e.preventDefault();
+  const handleEditCliente = ({
+    userSelect,
+    photo,
+    phone,
+    birthDate,
+    gender,
+  }) => {
     setLoading(true);
     UserService.patchClient(
       client.id,
       {
-        id_user: selectedUser.id,
-        photo: imageBase64 ? imageBase64 : selectedImage,
+        id_user: userSelect.id,
+        photo,
         phone,
         birthDate,
         gender,
@@ -157,15 +176,17 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
 
   useEffect(() => {
     if (client) {
-      setSelectedUser(client.user);
-      setPhone(client.phone);
-      setBirthDate(moment(client.birthDate).format("YYYY-MM-DD"));
-      setGender(client.gender);
-      setSelectedImage(client.photo);
+      setValue("userSelect", client.user);
+      setUserSelected(client.user);
+      setValue("photo", client.photo);
+      setValue("phone", client.phone);
+      setValue("birthDate", moment(client.birthDate).format("YYYY-MM-DD"));
+      setValue("gender", client.gender);
     } else {
-      clearFields();
+      reset();
+      setUserSelected(null);
     }
-  }, [client]);
+  }, [client, setValue, reset]);
 
   return (
     <Modal
@@ -178,89 +199,67 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
     >
       <form
         className="flex flex-col gap-2"
-        onSubmit={client ? handleEditCliente : handleSaveCliente}
+        onSubmit={handleSubmit(client ? handleEditCliente : handleSaveCliente)}
       >
-        <div className="flex flex-col mt-4 gap-2 items-center">
-          {selectedImage ? (
-            <img
-              src={selectedImage}
-              alt="Imagem do cliente selecionada"
-              className="mt-2 w-32 h-32 object-cover rounded-full"
-            />
-          ) : (
-            <div className="flex items-center justify-center mt-2 w-32 h-32 bg-gray-200 rounded-full">
-              <FaUser className="w-16 h-16 text-gray-500" />
-            </div>
-          )}
-          <Button onClick={openFileSelector} disabled={loading} size="fit">
-            Selecionar Foto
-          </Button>
-          <input
-            type="file"
-            accept="image/jpeg, image/png"
-            onChange={handleImageChange}
-            ref={fileInputRef}
-            className="hidden"
-          />
-        </div>
+        <PhotoSelector
+          loading={loading}
+          onSelect={handleImageChange}
+          photo={getValues("photo")}
+        />
 
         <div className="flex flex-col">
           <p>Usuário</p>
           <UserSelect
             users={users}
-            onChange={handleUserChange}
+            onChange={(selectedUser) => {
+              setValue("userSelect", selectedUser);
+              trigger("userSelect");
+            }}
             loading={loadingUsers}
             disabled={client || loadingUsers || loading}
-            userSelected={selectedUser}
+            userSelected={userSelected}
           />
+          {errors.userSelect && (
+            <p className="text-xs text-red-500 mt-1">
+              {errors.userSelect.id.message}
+            </p>
+          )}
         </div>
 
-        <div className="flex flex-col">
-          <label htmlFor="phone" className="text-sm">
-            Telefone
-          </label>
-          <input
-            type="text"
-            id="phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-            placeholder="Digite o telefone"
-            disabled={loading}
-          />
-        </div>
+        <InputField
+          id="phone"
+          label="Telefone"
+          loading={loading}
+          placeholder="Digite o telefone"
+          hasError={errors?.phone}
+          errorMessage={errors?.phone?.message}
+          register={register}
+        />
 
-        <div className="flex flex-col">
-          <label htmlFor="birthDate" className="text-sm">
-            Data de Nascimento
-          </label>
-          <input
-            type="date"
-            id="birthDate"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-            className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-            disabled={loading}
-          />
-        </div>
+        <InputField
+          id="birthDate"
+          label="Data de Nascimento"
+          type="date"
+          loading={loading}
+          hasError={errors?.birthDate}
+          errorMessage={errors?.birthDate?.message}
+          register={register}
+        />
 
-        <div className="flex flex-col">
-          <label htmlFor="gender" className="text-sm">
-            Gênero
-          </label>
-          <select
-            id="gender"
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-            disabled={loading}
-          >
-            <option value="">Selecione o Gênero</option>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-            <option value="O">Outro</option>
-          </select>
-        </div>
+        <SelectField
+          id="gender"
+          label="Gênero"
+          loading={loading}
+          hasError={errors?.gender}
+          errorMessage={errors?.gender?.message}
+          options={[
+            { value: "", label: "Selecione o Gênero" },
+            { value: "M", label: "Masculino" },
+            { value: "F", label: "Feminino" },
+            { value: "O", label: "Outro" },
+          ]}
+          register={register}
+        />
 
         <div className="mt-4 gap-2 flex justify-end">
           <Button
@@ -271,7 +270,13 @@ const ModalClient = ({ isModalOpen, handleCloseModal, client }) => {
           >
             Cancelar
           </Button>
-          <Button type="submit" disabled={loading} variant="success" size="fit">
+          <Button
+            type="submit"
+            disabled={loading}
+            loading={loading}
+            variant="success"
+            size="fit"
+          >
             Salvar
           </Button>
         </div>

@@ -38,6 +38,7 @@ const ClientSelect = ({
   }, []);
 
   useEffect(() => {
+    console.log('clientSelected', clientSelected);
     if (clientSelected?.name) {
       setSearch(clientSelected.name);
     } else {

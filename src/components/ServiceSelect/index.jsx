@@ -10,8 +10,8 @@ const ServiceSelect = ({
   const [search, setSearch] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  const filteredServices = services.filter((service) =>
+  console.log("services", services);
+  const filteredServices = services?.filter((service) =>
     String(service?.service?.name || service.name)
       .toLowerCase()
       .includes(String(search).toLowerCase())

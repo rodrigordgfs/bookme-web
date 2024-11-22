@@ -2,43 +2,70 @@ import { useState, useContext, useEffect } from "react";
 import Modal from "../Modal";
 import { AuthContext } from "../../contexts/auth";
 import { toast } from "react-toastify";
-import { FaSpinner } from "react-icons/fa";
 import ServiceService from "../../services/services";
 import Button from "../Button";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import InputField from "../InputField";
+
+const schema = z.object({
+  name: z.string().min(3, "O nome do serviço deve ter pelo menos 3 caracteres"),
+  price: z
+    .string()
+    .transform((val) => Number(val))
+    .refine((val) => !isNaN(val) && val > 0, {
+      message: "O preço do serviço deve ser maior que 0",
+    }),
+  duration: z
+    .string()
+    .transform((val) => Number(val))
+    .refine((val) => !isNaN(val) && val > 0, {
+      message: "A duração do serviço deve ser maior que 0",
+    }),
+  description: z
+    .string()
+    .min(3, "A descrição do serviço deve ter pelo menos 3 caracteres"),
+});
 
 const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
   const { user } = useContext(AuthContext);
 
-  const [serviceName, setServiceName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [duration, setDuration] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: "",
+      price: "",
+      duration: "",
+      description: "",
+    },
+  });
 
   const closeModal = () => {
     handleCloseModal();
-    clearFields();
+    reset();
   };
 
-  const clearFields = () => {
-    setServiceName("");
-    setDescription("");
-    setPrice("");
-    setDuration("");
-  };
-
-  const handleSaveService = (e) => {
-    e.preventDefault();
+  const handleSaveService = ({ name, price, duration, description }) => {
     setLoading(true);
 
-    const newService = {
-      name: serviceName,
-      price: Number(price),
-      duration: Number(duration),
-      description,
-    };
-
-    ServiceService.postService(newService, user.token)
+    ServiceService.postService(
+      {
+        name: name,
+        description,
+        price: Number(price),
+        duration: Number(duration),
+      },
+      user.token
+    )
       .then(() => {
         toast.success("Serviço cadastrado com sucesso!");
         closeModal();
@@ -58,19 +85,19 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
       });
   };
 
-  const handleEditService = (e) => {
-    e.preventDefault();
+  const handleEditService = ({ name, price, duration, description }) => {
     setLoading(true);
 
-    const editedService = {
-      id: service.id,
-      name: serviceName,
-      price: Number(price),
-      duration: Number(duration),
-      description,
-    };
-
-    ServiceService.patchService(editedService, user.token)
+    ServiceService.patchService(
+      service.id,
+      {
+        name: name,
+        description,
+        price: Number(price),
+        duration: Number(duration),
+      },
+      user.token
+    )
       .then(() => {
         toast.success("Serviço editado com sucesso!");
         closeModal();
@@ -92,14 +119,14 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
 
   useEffect(() => {
     if (service) {
-      setServiceName(service.name);
-      setDescription(service.description);
-      setPrice(service.price);
-      setDuration(service.duration);
+      setValue("name", service.name);
+      setValue("price", service.price);
+      setValue("duration", service.duration);
+      setValue("description", service.description);
     } else {
-      clearFields();
+      reset();
     }
-  }, [service]);
+  }, [service, register, reset, setValue]);
 
   return (
     <Modal
@@ -112,66 +139,55 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
     >
       <form
         className="flex flex-col gap-2"
-        onSubmit={service ? handleEditService : handleSaveService}
+        onSubmit={handleSubmit(service ? handleEditService : handleSaveService)}
       >
-        <div className="flex flex-col">
-          <label htmlFor="serviceName" className="text-sm">
-            Nome do Serviço
-          </label>
-          <input
-            type="text"
-            id="serviceName"
-            value={serviceName}
-            onChange={(e) => setServiceName(e.target.value)}
-            className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg"
-            placeholder="Digite o nome do serviço"
-            disabled={loading}
-          />
-        </div>
+        <InputField
+          id="name"
+          label="Nome do Serviço"
+          placeholder="Digite o nome do serviço"
+          register={register}
+          disabled={loading}
+          hasError={errors?.name}
+          errorMessage={errors?.name?.message}
+          loading={loading}
+          type="text"
+        />
 
-        <div className="flex flex-col">
-          <label htmlFor="description" className="text-sm">
-            Descrição
-          </label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full h-20 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg"
-            placeholder="Digite a descrição do serviço"
-            disabled={loading}
-          />
-        </div>
+        <InputField
+          id="description"
+          label="Descrição"
+          placeholder="Digite a descrição do serviço"
+          register={register}
+          disabled={loading}
+          hasError={errors?.description}
+          errorMessage={errors?.description?.message}
+          loading={loading}
+          type="text"
+        />
 
-        <div className="flex flex-col">
-          <label htmlFor="price" className="text-sm">
-            Preço
-          </label>
-          <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg"
-            placeholder="Digite o preço"
-            disabled={loading}
-          />
-        </div>
+        <InputField
+          id="price"
+          label="Preço"
+          placeholder="Digite o preço"
+          register={register}
+          disabled={loading}
+          hasError={errors?.price}
+          errorMessage={errors?.price?.message}
+          loading={loading}
+          type="number"
+        />
 
-        <div className="flex flex-col">
-          <label htmlFor="duration" className="text-sm">
-            Duração (em minutos)
-          </label>
-          <input
-            type="number"
-            id="duration"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg"
-            placeholder="Digite a duração"
-            disabled={loading}
-          />
-        </div>
+        <InputField
+          id="duration"
+          label="Duração"
+          placeholder="Digite a duração"
+          register={register}
+          disabled={loading}
+          hasError={errors?.duration}
+          errorMessage={errors?.duration?.message}
+          loading={loading}
+          type="number"
+        />
 
         <div className="mt-4 gap-2 flex justify-end">
           <Button
@@ -182,7 +198,13 @@ const ModalService = ({ isModalOpen, handleCloseModal, service }) => {
           >
             Cancelar
           </Button>
-          <Button type="submit" disabled={loading} variant="success" size="fit">
+          <Button
+            type="submit"
+            loading={loading}
+            disabled={loading}
+            variant="success"
+            size="fit"
+          >
             Salvar
           </Button>
         </div>

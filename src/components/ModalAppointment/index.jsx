@@ -8,7 +8,45 @@ import ClientService from "../../services/clients";
 import ProfissionalsService from "../../services/profissionals";
 import AppointmentService from "../../services/appointment";
 import { toast } from "react-toastify";
-import { FaSpinner } from "react-icons/fa";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import SelectField from "../SelectField";
+import Button from "../Button";
+import moment from "moment";
+
+const schema = z.object({
+  status: z
+    .enum(["pending", "confirmed", "completed", "canceled"], {
+      errorMap: () => ({ message: "Selecione um status válido" }),
+    }).optional(),
+  clientSelected: z
+    .object({
+      id: z.string().min(1, "Selecione um cliente válido"),
+    }),
+  profissionalSelected: z
+    .object({
+      id: z.string().min(1, "Selecione um profissional válido"),
+    }),
+  serviceSelected: z
+    .object({
+      id: z.string().min(1, "Selecione um serviço válido"),
+    }),
+  date: z.preprocess(
+    (input) => {
+      if (typeof input === "string" || input instanceof Date) {
+        const date = new Date(input);
+        return isNaN(date.getTime()) ? undefined : date;
+      }
+      return undefined;
+    },
+    z.date().refine((date) => date < new Date(), {
+      message: "A data do agendamento deve ser maior ou igual a data atual",
+    })
+  ),
+  hour: z.string().min(1, "Selecione um horário válido"),
+  observation: z.string().optional(),
+});
 
 const ModalAppointment = ({
   isModalOpen,
@@ -22,26 +60,45 @@ const ModalAppointment = ({
   const [selectedProfissional, setSelectedProfissional] = useState(null);
   const [selectedProfissionalService, setSelectedProfissionalService] =
     useState(null);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-  const [observation, setObservation] = useState("");
   const [clients, setClients] = useState([]);
   const [loadingClients, setLoadingClients] = useState(false);
   const [profissionals, setProfissionals] = useState([]);
   const [loadingProfissionals, setLoadingProfissionals] = useState(false);
   const [services, setServices] = useState([]);
-  const [status, setStatus] = useState("");
   const [loadingServices, setLoadingServices] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSaveAppointment = (e) => {
-    e.preventDefault();
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    trigger,
+    getValues,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      status: undefined,
+      clientSelected: { id: "", user: { id: "", name: "", email: "" } },
+      professionalSelected: { id: "", user: { id: "", name: "", email: "" } },
+      serviceSelected: {
+        id: "",
+        service: { id: "", name: "", price: "", duration: "" },
+      },
+      date: "",
+      hour: "",
+      observation: "",
+    },
+  });
+
+  const handleSaveAppointment = ({ clientSelected, serviceSelected, date, hour, observation }) => {
     setLoading(true);
     AppointmentService.postAppointment(
       {
-        professionalServiceId: selectedProfissionalService.id,
-        clientId: selectedClient.id,
-        dateTime: `${selectedDate}T${selectedTime}:00`,
+        professionalServiceId: serviceSelected.id,
+        clientId: clientSelected.id,
+        dateTime: `${moment(date).format('YYYY-MM-DD')}T${hour}:00`,
         observation,
       },
       user.token
@@ -65,15 +122,14 @@ const ModalAppointment = ({
       });
   };
 
-  const handleEditAppointment = (e) => {
-    e.preventDefault();
+  const handleEditAppointment = ({ clientSelected, serviceSelected, date, hour, observation, status }) => {
     setLoading(true);
     AppointmentService.patchAppointment(
       selectedAppointment.id,
       {
-        professionalServiceId: selectedProfissionalService.id,
-        clientId: selectedClient.id,
-        dateTime: `${selectedDate}T${selectedTime}:00`,
+        professionalServiceId: serviceSelected.id,
+        clientId: clientSelected.id,
+        dateTime: `${moment(date).format('YYYY-MM-DD')}T${hour}:00`,
         status,
         observation,
       },
@@ -96,27 +152,6 @@ const ModalAppointment = ({
       .finally(() => {
         setLoading(false);
       });
-  };
-
-  const handleClientChange = (client) => {
-    setSelectedClient(client);
-  };
-
-  const handleProfissionalChange = (profissional) => {
-    setSelectedProfissional(profissional);
-    handleLoadProfessionalServices(profissional.id);
-  };
-
-  const handleServiceChange = (service) => {
-    setSelectedProfissionalService(service);
-  };
-
-  const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
-  };
-
-  const handleTimeChange = (e) => {
-    setSelectedTime(e.target.value);
   };
 
   const handleLoadClients = useCallback(() => {
@@ -162,7 +197,8 @@ const ModalAppointment = ({
       setLoadingServices(true);
       ProfissionalsService.getProfessionalServices(professionalId, user.token)
         .then(({ data }) => {
-          setServices(data.data);
+          setServices(data);
+          
           if (professionalService) {
             setSelectedProfissionalService(professionalService);
           }
@@ -194,22 +230,27 @@ const ModalAppointment = ({
         selectedAppointment.professional.id,
         selectedAppointment.service
       );
+      setValue("status", selectedAppointment.status);
+      setValue("clientSelected", selectedAppointment.client);
       setSelectedClient(selectedAppointment.client);
+      setValue("professionalSelected", selectedAppointment.professional);
       setSelectedProfissional(selectedAppointment.professional);
-      setSelectedDate(selectedAppointment.date);
-      setSelectedTime(selectedAppointment.hour);
-      setObservation(selectedAppointment.observation || "");
-      setStatus(selectedAppointment.status);
+      setValue("service", selectedAppointment.service);
+      setSelectedProfissionalService(selectedAppointment.service);
+      setValue("date", selectedAppointment.date);
+      setValue("hour", selectedAppointment.hour);
+      setValue("observation", selectedAppointment.observation);
     } else {
-      setSelectedClient(null);
-      setSelectedProfissional(null);
-      setSelectedProfissionalService(null);
-      setSelectedDate("");
-      setSelectedTime("");
-      setObservation("");
-      setStatus("");
+      reset();
     }
-  }, [selectedAppointment, handleLoadProfessionalServices]);
+  }, [selectedAppointment, handleLoadProfessionalServices, reset, setValue]);
+
+  useEffect(() => {
+    console.log('profissional', getValues('clientSelected'));
+    console.log('error', errors);
+    
+    console.log(errors);
+  }, [errors, getValues]);
 
   return (
     <Modal
@@ -225,108 +266,138 @@ const ModalAppointment = ({
       <div>
         <form
           className="flex flex-col gap-2"
-          onSubmit={
+          onSubmit={handleSubmit(
             selectedAppointment ? handleEditAppointment : handleSaveAppointment
-          }
+          )}
         >
           {selectedAppointment && (
-            <div className="flex flex-col">
-              <p>Status</p>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-                disabled={loading}
-              >
-                <option value="">Selecione o Status</option>
-                <option value="pending">Pendente</option>
-                <option value="confirmed">Confirmado</option>
-                <option value="completed">Completo</option>
-                <option value="canceled">Cancelado</option>
-              </select>
-            </div>
+            <SelectField
+              id="status"
+              label="Status"
+              name="status"
+              register={register}
+              error={errors.status}
+              options={[
+                { value: "pending", label: "Pendente" },
+                { value: "confirmed", label: "Confirmado" },
+                { value: "completed", label: "Completo" },
+                { value: "canceled", label: "Cancelado" },
+              ]}
+              disabled={loading}
+            />
           )}
           <div className="flex flex-col">
             <p>Cliente</p>
             <ClientSelect
               clients={clients}
-              onChange={handleClientChange}
+              onChange={(selectedCliente) => {
+                setValue("clientSelected", selectedCliente);
+                trigger("clientSelected");
+              }}
               loading={loadingClients}
               disabled={loadingClients || loading}
               clientSelected={selectedClient}
             />
+            {errors.clientSelected && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.clientSelected.id.message}
+              </p>
+            )}
           </div>
           <div className="flex flex-col">
             <p>Profissional</p>
             <ProfissionalSelect
               professionals={profissionals}
-              onChange={handleProfissionalChange}
+              onChange={(selectedProfissional) => {
+                setValue("profissionalSelected", selectedProfissional);
+                trigger("profissionalSelected");
+                handleLoadProfessionalServices(selectedProfissional.id);
+              }}
               loading={loadingProfissionals}
               disabled={loadingProfissionals || loading}
               professionalSelected={selectedProfissional}
             />
+            {errors.profissionalSelected && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.profissionalSelected.message}
+              </p>
+            )}
           </div>
           <div className="flex flex-col">
             <p>Serviços</p>
             <ServiceSelect
               services={services}
-              onChange={handleServiceChange}
-              disabled={selectedProfissional === null || loading}
+              onChange={(selectedService) => {
+                setValue("serviceSelected", selectedService);
+                trigger("serviceSelected");
+              }}
+              disabled={!getValues('profissionalSelected')?.id || loading}
               loading={loadingServices}
               serviceSelected={selectedProfissionalService}
             />
+            {errors.serviceSelected && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.serviceSelected.message}
+              </p>
+            )}
           </div>
           <div className="flex gap-4">
             <div className="flex flex-col flex-1 relative">
               <p>Data</p>
               <input
                 type="date"
-                value={selectedDate}
-                onChange={handleDateChange}
                 className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg pr-10"
-                disabled={loading || selectedProfissionalService === null}
+                disabled={loading}
+                {...register("date")}
               />
+              {errors.date && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.date.message}
+                </p>
+              )}
             </div>
             <div className="flex flex-col flex-1 relative">
               <p>Hora</p>
               <input
                 type="time"
-                value={selectedTime}
-                onChange={handleTimeChange}
                 className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg pr-10"
-                disabled={selectedDate === "" || loading}
+                disabled={loading}
+                {...register("hour")}
               />
+              {errors.hour && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.hour.message}
+                </p>
+              )}
             </div>
           </div>
           <div className="flex flex-col">
             <p>Observações</p>
             <textarea
-              value={observation}
-              onChange={(e) => setObservation(e.target.value)}
               className="w-full h-24 px-4 py-2 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg"
               placeholder="Digite aqui as observações sobre o agendamento"
               disabled={loading}
+              {...register("observation")}
             />
           </div>
-          <div className="mt-4 flex justify-end">
-            <button
+          <div className="mt-4 gap-2 flex justify-end">
+            <Button
               onClick={onClose}
-              className="bg-red-500 text-white px-4 py-2 rounded-md mr-2"
               disabled={loading}
+              variant="danger"
+              size="fit"
             >
               Cancelar
-            </button>
-            <button
-              className="bg-green-500 text-white px-4 py-2 rounded-md"
+            </Button>
+            <Button
               type="submit"
               disabled={loading}
+              loading={loading}
+              variant="success"
+              size="fit"
             >
-              {loading ? (
-                <FaSpinner className="animate-spin mx-auto" />
-              ) : (
-                "Salvar"
-              )}
-            </button>
+              Salvar
+            </Button>
           </div>
         </form>
       </div>

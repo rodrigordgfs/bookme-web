@@ -1,45 +1,57 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { FaUser } from "react-icons/fa";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import UserSelect from "../../UserSelect";
 import { AuthContext } from "../../../contexts/auth";
 import UserService from "../../../services/user";
 import ProfissionalService from "../../../services/profissionals";
 import Button from "../../Button";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import PhotoSelector from "../../PhotoSelector";
+import InputField from "../../InputField";
+
+const schema = z.object({
+  photo: z.string().optional(),
+  userSelect: z
+    .object({
+      id: z.string().min(1, "Selecione um usuário válido"),
+    })
+    .refine((data) => data.id !== undefined, {
+      message: "O campo usuário é obrigatório",
+    }),
+  specialty: z
+    .string()
+    .min(3, "A especialidade deve ter pelo menos 3 caracteres"),
+});
 
 export const ModalProfissionalData = ({ profissional, closeModal }) => {
   const { user } = useContext(AuthContext);
 
-  const fileInputRef = useRef(null);
-
-  const [imageBase64, setImageBase64] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
-  const [specialty, setSpecialty] = useState("");
 
-  const handleUserChange = (user) => {
-    setSelectedUser(user);
-  };
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    trigger,
+    getValues,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      userSelect: { id: "", name: "", email: "" },
+      photo: "",
+      specialty: "",
+    },
+  });
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file && ["image/jpg", "image/jpeg", "image/png"].includes(file.type)) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageBase64(reader.result);
-        setSelectedImage(URL.createObjectURL(file));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      toast.error("Selecione uma imagem no formato JPG ou PNG.");
-    }
-  };
-
-  const openFileSelector = () => {
-    fileInputRef.current?.click();
+  const handleImageChange = (photo) => {
+    setValue("photo", photo);
   };
 
   const handleLoadUsers = useCallback(() => {
@@ -55,24 +67,16 @@ export const ModalProfissionalData = ({ profissional, closeModal }) => {
       });
   }, [user.token]);
 
-  const clearFields = () => {
-    setSelectedUser(null);
-    setSpecialty("");
-    setImageBase64("");
-    setSelectedImage(null);
-  };
-
   useEffect(() => {
     handleLoadUsers();
   }, [handleLoadUsers]);
 
-  const handleSaveProfissional = (e) => {
-    e.preventDefault();
+  const handleSaveProfissional = ({ userSelect, specialty, photo }) => {
     setLoading(true);
     ProfissionalService.postProfessional(
       {
-        id_user: selectedUser.id,
-        photo: imageBase64,
+        id_user: userSelect.id,
+        photo,
         specialty,
       },
       user.token
@@ -83,23 +87,26 @@ export const ModalProfissionalData = ({ profissional, closeModal }) => {
       })
       .catch(({ response }) => {
         console.log(response);
-        toast.error(
-          response?.data?.error || "Erro ao cadastrar o profissional!"
-        );
+        if (response?.data?.error) {
+          toast.error(response.data.error);
+        } else if (response?.data?.error[0]) {
+          toast.error(response.data.error[0].message);
+        } else {
+          toast.error("Erro ao cadastrar o cliente!");
+        }
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  const handleEditProfissional = (e) => {
-    e.preventDefault();
+  const handleEditProfissional = ({ userSelect, specialty, photo }) => {
     setLoading(true);
     ProfissionalService.patchProfessional(
       profissional.id,
       {
-        id_user: selectedUser.id,
-        photo: imageBase64 || selectedImage || undefined,
+        id_user: userSelect.id,
+        photo,
         specialty,
       },
       user.token
@@ -119,64 +126,58 @@ export const ModalProfissionalData = ({ profissional, closeModal }) => {
 
   useEffect(() => {
     if (profissional) {
+      setValue("userSelect", profissional.user);
       setSelectedUser(profissional.user);
-      setSpecialty(profissional.specialty);
-      setSelectedImage(profissional.photo);
+      setValue("specialty", profissional.specialty);
+      setValue("photo", profissional.photo);
     } else {
-      clearFields();
+      reset();
     }
-  }, [profissional]);
+  }, [profissional, reset, setValue]);
 
   return (
     <form
       className="flex flex-col gap-2"
-      onSubmit={profissional ? handleEditProfissional : handleSaveProfissional}
+      onSubmit={handleSubmit(
+        profissional ? handleEditProfissional : handleSaveProfissional
+      )}
     >
-      <div className="flex flex-col gap-2 mt-4 items-center">
-        {selectedImage ? (
-          <img
-            src={selectedImage}
-            alt="Imagem do profissional"
-            className="mt-2 w-32 h-32 object-cover rounded-full"
-          />
-        ) : (
-          <div className="flex items-center justify-center mt-2 w-32 h-32 bg-gray-200 rounded-full">
-            <FaUser className="w-16 h-16 text-gray-500" />
-          </div>
-        )}
-        <Button onClick={openFileSelector} disabled={loading} size="fit">
-          Selecionar Foto
-        </Button>
-        <input
-          type="file"
-          accept="image/jpeg, image/png"
-          onChange={handleImageChange}
-          ref={fileInputRef}
-          className="hidden"
-        />
-      </div>
+      <PhotoSelector
+        loading={loading}
+        onSelect={handleImageChange}
+        photo={getValues("photo")}
+      />
+
       <div className="flex flex-col">
         <p>Usuário</p>
         <UserSelect
           users={users}
-          onChange={handleUserChange}
+          onChange={(selectedUser) => {
+            setValue("userSelect", selectedUser);
+            trigger("userSelect");
+          }}
           loading={loadingUsers}
           disabled={profissional || loadingUsers || loading}
           userSelected={selectedUser}
         />
+        {errors.userSelect && (
+          <p className="text-xs text-red-500 mt-1">
+            {errors.userSelect.id.message}
+          </p>
+        )}
       </div>
-      <div className="flex flex-col">
-        <p>Especialidade</p>
-        <input
-          type="text"
-          id="specialty"
-          value={specialty}
-          onChange={(e) => setSpecialty(e.target.value)}
-          className="w-full h-10 px-4 bg-zinc-50 placeholder-zinc-700 border outline-none rounded-lg flex items-center gap-2 disabled:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
-          placeholder="Digite a especialidade"
-          disabled={loading}
-        />
-      </div>
+
+      <InputField
+        id="specialty"
+        label="Especialidade"
+        placeholder="Digite a especialidade"
+        register={register}
+        disabled={loading}
+        hasError={errors?.specialty}
+        errorMessage={errors?.specialty?.message}
+        loading={loading}
+        type="text"
+      />
 
       <div className="mt-4 gap-2 flex justify-end">
         <Button
@@ -187,7 +188,7 @@ export const ModalProfissionalData = ({ profissional, closeModal }) => {
         >
           Cancelar
         </Button>
-        <Button type="submit" disabled={loading} variant="success" size="fit">
+        <Button type="submit" loading={loading} disabled={loading} variant="success" size="fit">
           Salvar
         </Button>
       </div>

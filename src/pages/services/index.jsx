@@ -94,8 +94,8 @@ const ServicesPage = () => {
           currentPage={currentPage}
           onPageChange={(page) => handleLoadServices(null, null, null, page)}
           onItemsPerPageChange={(itemsPerPage) => {
-            console.log('itemsPerPage', itemsPerPage)
-            handleLoadServices(null, null, null, 1, itemsPerPage)
+            console.log("itemsPerPage", itemsPerPage);
+            handleLoadServices(null, null, null, 1, itemsPerPage);
           }}
         />
       )}

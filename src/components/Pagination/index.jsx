@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Button from "../Button";
 
 const Pagination = ({
   currentPage,
@@ -44,24 +45,20 @@ const Pagination = ({
         </select>
         <p>Items por página</p>
       </div>
-      <div className="flex flex-col md:flex-row items-center justify-end gap-2 p-4 bg-white w-full">
-        <button
-          onClick={handlePrev}
-          className="px-4 py-2 bg-blue-500  w-full md:w-auto text-white rounded disabled:bg-gray-300"
-          disabled={currentPage === 1}
-        >
+      <div className="flex flex-row items-center justify-center md:justify-end gap-2 p-4 bg-white w-full">
+        <Button size="icon" onClick={handlePrev} disabled={currentPage === 1}>
           <FaChevronLeft className="m-2" />
-        </button>
+        </Button>
         <div>
           Página {currentPage} de {totalPages}
         </div>
-        <button
+        <Button
+          size="icon"
           onClick={handleNext}
-          className="px-4 py-2 bg-blue-500  w-full md:w-auto text-white rounded disabled:bg-gray-300"
           disabled={currentPage === totalPages}
         >
           <FaChevronRight className="m-2" />
-        </button>
+        </Button>
       </div>
     </div>
   );

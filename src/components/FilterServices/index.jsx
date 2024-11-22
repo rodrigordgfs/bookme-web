@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Collapsible from "../Collapsible";
-import { FaSpinner } from "react-icons/fa";
 import Button from "../Button";
 
 const FilterServices = ({ onFilter, loading }) => {
